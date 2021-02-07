@@ -1,2 +1,3 @@
-# gazepy
-PiPy package to algorithmically analyze eye-tracking data
+# GazePy
+PiPy package to algorithmically analyze eye-tracking data.
+
