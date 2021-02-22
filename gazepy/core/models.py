@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
+
 @dataclass
-class Metadata():
+class Metadata:
     recording_name: str
 
-@dataclass
-class Dataset():
-    metadata: Metadata
 
+@dataclass
+class Dataset:
+    metadata: Metadata

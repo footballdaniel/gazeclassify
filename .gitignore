@@ -1,5 +1,6 @@
 # User defined ignores
 pypi_setup.md
+.raw_data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
