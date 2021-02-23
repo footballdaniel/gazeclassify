@@ -2,6 +2,7 @@
 PiPy package to algorithmically analyze eye-tracking data.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/footballdaniel/gazepy/blob/main/colab.ipynb)
+[![Python Package Linux](https://github.com/footballdaniel/gazepy/actions/workflows/test.yml/badge.svg)](https://github.com/footballdaniel/gazepy/actions/workflows/test.yml)
 
 ---
 
