@@ -1,8 +1,8 @@
 from gazepy.core.data_loader import PupilDataDeserializer
 
 
-class Test_PupilDataDeserializer:
-    def test_if_can_read_timestamps(self):
+class Test_PupilDataDeserializer_WorldFramesCSV:
+    def test_if_can_read_timestamps_from_exemplary_file(self):
 
         loader = PupilDataDeserializer().load_from_export_folder("gazepy/tests/data/")
 
@@ -18,3 +18,8 @@ class Test_PupilDataDeserializer:
         loader = PupilDataDeserializer().load_from_export_folder("gazepy/tests/data/")
 
         assert loader.world_timestamps[-1] == 67.200536
+
+
+class Test_PupilDataDeserializer_Video:
+    def test_if_can_read_first_frame_to_array_from_exemplary_file(self):
+        pass
