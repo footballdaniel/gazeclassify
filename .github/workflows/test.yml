@@ -23,7 +23,7 @@ jobs:
         pip install black pytest mypy
     - name: Code formatting
       run: |
-        black --check .
+        black --check gazepy
     - name: Test with pytest
       run: |
         pytest

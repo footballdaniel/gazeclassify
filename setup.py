@@ -10,6 +10,9 @@ setuptools.setup(
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
+    install_requires= [
+    	"pixellib"
+    ],
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/footballdaniel/gazepy",
