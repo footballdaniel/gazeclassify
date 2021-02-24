@@ -34,7 +34,7 @@ python -m build # Build will be placed in /dist folder
 	```
 - Use uploaded test package locally
  	```
-	pip install -i https://test.pypi.org/simple/ gazepy
+	pip install -i https://test.pypi.org/simple/ gazeclassify
 	```
   - When prompted to use a username, type `__token__`
   - For the password, paste the token value from above and hit enter
@@ -50,7 +50,7 @@ python -m build # Build will be placed in /dist folder
 - The package is now available under `https://test.pypi.org/`
 - To install the package locally, use
 	```
-	pip install -i https://test.pypi.org/simple/ gazepy
+	pip install -i https://test.pypi.org/simple/ gazeclassify
 	```
 - To use locally in a python script, do
 	```
@@ -61,3 +61,10 @@ python -m build # Build will be placed in /dist folder
 ### Upload package to PyPI server
 - Create another user account on [pypi.org](https://pypi.org/)
 - Use `twine upload dist/*` to send the package to the server
+
+### Save token in Home/.pypirc
+```
+[pypi]
+  username = __token__
+  password = tokengoeshere
+```

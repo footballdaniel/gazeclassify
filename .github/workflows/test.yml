@@ -28,10 +28,10 @@ jobs:
         sudo apt install ffmpeg
     - name: Code formatting
       run: |
-        black --check gazepy
+        black --check gazeclassify
     - name: Test with pytest
       run: |
         pytest
     - name: Test with mypy
       run: |
-        mypy gazepy --strict
+        mypy gazeclassify --strict

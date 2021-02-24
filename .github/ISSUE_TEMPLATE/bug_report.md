@@ -25,4 +25,4 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
- - gazepy version [e.g. 1.0]
+ - gazeclassify version [e.g. 1.0]

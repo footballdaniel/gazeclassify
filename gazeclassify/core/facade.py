@@ -1,5 +1,5 @@
-from gazepy.core.models import Dataset, Metadata
-from gazepy.core.data_loader import PupilDataDeserializer
+from gazeclassify.core.models import Dataset, Metadata
+from gazeclassify.core.data_loader import PupilDataDeserializer
 
 
 def load_from_pupil_invisible(path: str) -> Dataset:
