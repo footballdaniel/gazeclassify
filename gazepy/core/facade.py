@@ -1,9 +1,8 @@
-from dataclasses import dataclass, fields
 from gazepy.core.models import Dataset, Metadata
 from gazepy.core.data_loader import PupilDataDeserializer
 
 
-def load_from_pupil_invisible(self, path: str) -> Dataset:
+def load_from_pupil_invisible(path: str) -> Dataset:
     data = PupilDataDeserializer().load_from_export_folder(path)
     print("Has Loaded Data")
 

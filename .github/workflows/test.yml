@@ -29,4 +29,4 @@ jobs:
         pytest
     - name: Test with mypy
       run: |
-        mypy gazepy
+        mypy gazepy --strict
