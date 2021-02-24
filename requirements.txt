@@ -1,5 +1,2 @@
-pixellib
-ffmpeg-python
-numpy
-tensorflow
-imgaug
+tensorflow==2.4.1
+pixellib==0.5.2
