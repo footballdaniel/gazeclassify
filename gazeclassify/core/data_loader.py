@@ -4,7 +4,7 @@ from typing import Any, List
 import pathlib
 import csv
 import ffmpeg  # type: ignore
-import numpy as np
+import numpy as np  # type: ignore
 
 
 @dataclass
