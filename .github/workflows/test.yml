@@ -12,7 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout the repository
+      uses: actions/checkout@v2
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -22,6 +23,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install black pytest mypy
         pip install -r requirements.txt
+    - name: Install system dependency FFMPEG
+      run: |
+        sudo apt install ffmpeg
     - name: Code formatting
       run: |
         black --check gazepy
