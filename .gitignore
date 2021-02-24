@@ -1,6 +1,10 @@
 # User defined ignores
 .raw_data/
 .vscode/
+.raw_pixellib/
+pixellib.py
+image.jpg
+venvpixellib/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

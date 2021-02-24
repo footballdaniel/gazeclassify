@@ -1,3 +1,5 @@
 pixellib
 ffmpeg-python
 numpy
+tensorflow
+imgaug
