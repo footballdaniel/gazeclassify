@@ -4,6 +4,7 @@
 .raw_pixellib/
 pixellib.py
 image.jpg
+image_new.jpg
 venvpixellib/
 
 # Byte-compiled / optimized / DLL files
