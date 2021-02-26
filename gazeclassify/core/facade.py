@@ -19,5 +19,5 @@ def segment_with_pixellib() -> None:
     segment_image.process_video(
         "drive/MyDrive/example_pupil.mp4",
         frames_per_second=20,
-        output_video_name="output.mp4",
+        output_video_name="output.mp4"
     )
