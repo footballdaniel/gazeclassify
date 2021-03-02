@@ -3,8 +3,7 @@
 .vscode/
 .raw_pixellib/
 pixellib.py
-image.jpg
-image_new.jpg
+image*.jpg
 venvpixellib/
 
 # Byte-compiled / optimized / DLL files
