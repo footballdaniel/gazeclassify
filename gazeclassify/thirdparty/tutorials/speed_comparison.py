@@ -37,5 +37,5 @@ def segment_video(model_file: str, video_file: str) -> None:
     )
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()
