@@ -1,6 +1,7 @@
-from gazeclassify.core.models import Dataset, Metadata
+from gazeclassify.core.model import DataRecord, Dataset, GazeData, Metadata, VideoFrame
 from gazeclassify.core.data_loader import PupilDataLoader
 from pixellib.instance import instance_segmentation  # type: ignore
+import numpy as np  # type: ignore
 
 
 def load_from_pupil_invisible(path: str) -> Dataset:
@@ -9,7 +10,10 @@ def load_from_pupil_invisible(path: str) -> Dataset:
 
     # Require return dataset
     metadata = Metadata("str")
-    dataset = Dataset(metadata)
+    world_frame = VideoFrame(1, 1, np.array())
+    gaze = GazeData(1, 1)
+    data_record = DataRecord(0, world_frame, gaze)
+    dataset = Dataset([data_record], metadata)
     return dataset
 
 
