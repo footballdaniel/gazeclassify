@@ -8,7 +8,7 @@ import numpy as np  # type: ignore
 
 
 @dataclass
-class PupilDataDeserializer:
+class PupilDataLoader:
     _world_timestamps: List[float] = field(default_factory=list)
 
     @property
@@ -19,7 +19,7 @@ class PupilDataDeserializer:
     def world_videoframes(self) -> Any:
         return self._world_videoframes
 
-    def load_from_export_folder(self, path: str) -> PupilDataDeserializer:
+    def load_from_export_folder(self, path: str) -> PupilDataLoader:
 
         timestamps_file = self._get_world_timestamps_filepath(path)
 
