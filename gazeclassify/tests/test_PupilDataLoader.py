@@ -1,5 +1,6 @@
 from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 
+
 class Test_PupilDataLoader_WorldFramesCSV:
     def test_if_can_read_timestamps_from_exemplary_file(self) -> None:
         loader = PupilDataLoader().load_from_export_folder("gazeclassify/tests/data/")

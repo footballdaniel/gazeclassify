@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, PropertyMock
 from gazeclassify.serializer.pupil_serializer import PupilDataDeserializer
 
 
-class Test_PupilDataSerializer:
+class Test_PupilDataDeSerializer:
     def test_instantiate_datarecords(self) -> None:
         # https://docs.python.org/3/library/unittest.mock.html#patch
         # https://docs.python.org/3/library/unittest.mock.html#unittest.mock.PropertyMock

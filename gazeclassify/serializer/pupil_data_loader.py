@@ -19,6 +19,7 @@ def _get_world_timestamps_filepath(path: str) -> pathlib.Path:
 class PupilDataLoader:
     _world_video_height: int = 0
     _world_video_width: int = 0
+    _world_video_framenumber: int = 0
     _world_timestamps: List[float] = field(default_factory=list)
 
     @property
@@ -30,12 +31,16 @@ class PupilDataLoader:
         return self._world_videoframes
 
     @property
-    def world_video_height(self) -> float:
+    def world_video_height(self) -> int:
         return self._world_video_height
 
     @property
-    def world_video_widht(self) -> float:
+    def world_video_width(self) -> int:
         return self._world_video_width
+
+    @property
+    def world_video_framenumber(self) -> int:
+        return self._world_video_framenumber
 
     def load_from_export_folder(self, path: str) -> PupilDataLoader:
         timestamps_file = _get_world_timestamps_filepath(path)
