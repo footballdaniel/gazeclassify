@@ -5,6 +5,7 @@
 pixellib.py
 image*.jpg
 venvpixellib/
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
