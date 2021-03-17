@@ -1,8 +1,8 @@
 import numpy as np # type: ignore
 
-from gazeclassify.serialization.data_loader import PupilDataLoader
+from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 from gazeclassify.core.model import Dataset, VideoFrame, Metadata, GazeData, DataRecord
-from gazeclassify.repository import EyeTrackingDataRepository
+from gazeclassify.core.repository import EyeTrackingDataRepository
 
 
 class PupilInvisibleRepository(EyeTrackingDataRepository):

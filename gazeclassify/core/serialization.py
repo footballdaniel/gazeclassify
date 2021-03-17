@@ -1,6 +1,9 @@
 from dataclasses import dataclass
+from abc import ABC
 
 
 @dataclass
-class PupilDataDeserializer:
+class Deserializer(ABC):
     pass
+
+
