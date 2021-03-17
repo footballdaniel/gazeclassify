@@ -1,10 +1,18 @@
 from __future__ import annotations
+
+import csv
+import pathlib
 from dataclasses import dataclass, field
 from typing import Any, List
-import pathlib
-import csv
+
 import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
+
+
+def _get_world_timestamps_filepath(path: str) -> pathlib.Path:
+    folder = pathlib.Path(path)
+    full_filename = pathlib.Path.joinpath(folder, "world_timestamps.csv")
+    return full_filename
 
 
 @dataclass
@@ -20,11 +28,8 @@ class PupilDataLoader:
         return self._world_videoframes
 
     def load_from_export_folder(self, path: str) -> PupilDataLoader:
-
-        timestamps_file = self._get_world_timestamps_filepath(path)
-
+        timestamps_file = _get_world_timestamps_filepath(path)
         self._deserialize_world_timestamps(timestamps_file)
-
         self._deserialize_video(path)
 
         return self
@@ -48,11 +53,6 @@ class PupilDataLoader:
             self._world_timestamps.append(float(row[0]))
             self.line_count += 1
 
-    def _get_world_timestamps_filepath(self, path: str) -> pathlib.Path:
-        folder = pathlib.Path(path)
-        full_filename = pathlib.Path.joinpath(folder, "world_timestamps.csv")
-        return full_filename
-
     def _deserialize_video(self, path: str) -> None:
         folder = pathlib.Path(path)
         full_filename = pathlib.Path.joinpath(folder, "world.mp4")
@@ -72,10 +72,8 @@ class PupilDataLoader:
 
         frame_buffer, _ = (
             ffmpeg.input(full_filename, r=replay_rate_input)
-            .output(
-                "pipe:", format="rawvideo", pix_fmt="rgb24", **{"loglevel": log_level}
-            )
-            .run(capture_stdout=True)
+                .output("pipe:", format="rawvideo", pix_fmt="rgb24", **{"loglevel": log_level})
+                .run(capture_stdout=True)
         )
         print(type(frame_buffer))
         return frame_buffer
