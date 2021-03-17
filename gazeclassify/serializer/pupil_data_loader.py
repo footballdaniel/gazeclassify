@@ -72,9 +72,7 @@ class PupilDataLoader:
         full_filename = Path.joinpath(folder, default_video_name)
         self._ffmpeg_decode_size(full_filename)
         framebuffer = self._ffmpeg_decode(full_filename)
-        # height = 1088
-        # width = 1080
-        frames = np.frombuffer(framebuffer, np.uint8).reshape([-1, self._world_video_height, self.world_video_width, 3])
+        frames = np.frombuffer(framebuffer, np.uint8).reshape([-1, self._world_video_width, self.world_video_height, 3])
 
         self._world_videoframes = frames
 
