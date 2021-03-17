@@ -2,7 +2,7 @@ import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.core.model import Dataset
-from gazeclassify.core.pupil_repository import PupilInvisibleRepository
+from gazeclassify.serialization.pupil_repository import PupilInvisibleRepository
 
 
 def load_from_pupil_invisible(path: str) -> Dataset:

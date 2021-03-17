@@ -1,4 +1,3 @@
-from gazeclassify.core.data_loader import PupilDataLoader
 from gazeclassify.core.serializer import PupilDataSerializer
 from unittest.mock import MagicMock, PropertyMock
 
