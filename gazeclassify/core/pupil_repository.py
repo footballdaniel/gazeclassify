@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np # type: ignore
 
 from gazeclassify.core.data_loader import PupilDataLoader
 from gazeclassify.core.model import Dataset, VideoFrame, Metadata, GazeData, DataRecord
