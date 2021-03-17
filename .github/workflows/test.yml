@@ -21,14 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black pytest mypy
         pip install -r requirements.txt
     - name: Install system dependency FFMPEG
       run: |
         sudo apt install ffmpeg
-    - name: Code formatting
-      run: |
-        black --check gazeclassify
     - name: Test with pytest
       run: |
         pytest

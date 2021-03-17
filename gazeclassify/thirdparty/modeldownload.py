@@ -23,9 +23,7 @@ class ModelDownload:
         pathlib.Path(base_dir).mkdir(exist_ok=True, parents=True)
         return base_dir
 
-    def _download_model(
-        self, base_dir: str, model_name: str = "mask_rcnn_coco.h5"
-    ) -> Path:
+    def _download_model(self, base_dir: str, model_name: str = "mask_rcnn_coco.h5") -> Path:
         model_file = self._download_location(base_dir, model_name)
         self._download_if_not_existing(model_file)
         return model_file
