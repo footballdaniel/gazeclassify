@@ -1,10 +1,14 @@
 from __future__ import annotations
+
+from pathlib import Path
 from typing import Dict, Tuple
-from gazeclassify.thirdparty.modeldownload import ModelDownload  # type: ignore
-from pixellib.instance import instance_segmentation  # type: ignore
-from gazeclassify.thirdparty.helpers import InferSpeed  # type: ignore
+
 import cv2  # type: ignore
 import numpy as np  # type: ignore
+from pixellib.instance import instance_segmentation  # type: ignore
+
+from gazeclassify.thirdparty.helpers import InferSpeed
+from gazeclassify.thirdparty.modeldownload import ModelDownload
 
 
 def main() -> None:
@@ -36,14 +40,14 @@ def dilate(segmask: Dict[str, np.ndarray]) -> np.ndarray:
     return dilation
 
 
-def instantiate_model(model_file: str) -> instance_segmentation:
+def instantiate_model(model_file: Path) -> instance_segmentation:
     segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
-    segment_image.load_model(model_file)
+    segment_image.load_model(model_file.stem)
     return segment_image
 
 
 def extract_mask_and_output(
-    segment_image: instance_segmentation, targets: Dict[str, str], image_file: str
+        segment_image: instance_segmentation, targets: Dict[str, str], image_file: str
 ) -> Tuple[Dict[str, np.ndarray], np.ndarray]:
     segmask, output = segment_image.segmentImage(
         image_file,
@@ -54,7 +58,7 @@ def extract_mask_and_output(
 
 
 def export_to_file(
-    segmask: Dict[str, np.ndarray], output: np.ndarray, extended_segmask: np.ndarray
+        segmask: Dict[str, np.ndarray], output: np.ndarray, extended_segmask: np.ndarray
 ) -> None:
     cv2.imwrite("image_segmaskoutput.jpg", segmask["masks"].astype(int)[:, :, 1] * 255)
     cv2.imwrite("image_coloredoutptu.jpg", output)
