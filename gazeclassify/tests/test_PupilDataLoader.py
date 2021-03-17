@@ -16,6 +16,16 @@ class Test_PupilDataLoader_WorldFramesCSV:
 
 
 class Test_PupilDataLoader_Video:
-    def test_if_can_read_all_frames_from_exemplary_file(self) -> None:
-        loader = PupilDataLoader().load_from_export_folder("gazeclassify/tests/data/")
-        assert loader.world_videoframes.shape[0] == 58
+    def test_if_can_read_number_of_frames_from_exemplary_file(self) -> None:
+        loader = PupilDataLoader().load_from_export_folder("gazeclassify/tests/data/", "frame.mp4")
+        assert loader.world_videoframes.shape[0] == 1
+
+    def test_if_video_width_correct(self) -> None:
+        loader = PupilDataLoader()
+        loader._deserialize_video("gazeclassify/tests/data/", "frame.mp4")
+        assert loader.world_video_width == 1088
+
+    def test_if_video_width_correct(self) -> None:
+        loader = PupilDataLoader()
+        loader._deserialize_video("gazeclassify/tests/data/", "frame.mp4")
+        assert loader.world_video_height == 1080

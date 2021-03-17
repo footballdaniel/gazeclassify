@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 import csv
-import pathlib
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, List
 
 import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
 
 
-def _get_world_timestamps_filepath(path: str) -> pathlib.Path:
-    folder = pathlib.Path(path)
-    full_filename = pathlib.Path.joinpath(folder, "world_timestamps.csv")
+def _get_world_timestamps_filepath(path: str) -> Path:
+    folder = Path(path)
+    full_filename = Path.joinpath(folder, "world_timestamps.csv")
     return full_filename
 
 
@@ -42,13 +42,13 @@ class PupilDataLoader:
     def world_video_framenumber(self) -> int:
         return self._world_video_framenumber
 
-    def load_from_export_folder(self, path: str) -> PupilDataLoader:
+    def load_from_export_folder(self, path: str, default_video_name: str = "world.mp4") -> PupilDataLoader:
         timestamps_file = _get_world_timestamps_filepath(path)
         self._deserialize_world_timestamps(timestamps_file)
-        self._deserialize_video(path)
+        self._deserialize_video(path, default_video_name)
         return self
 
-    def _deserialize_world_timestamps(self, timestamps_file: pathlib.Path) -> None:
+    def _deserialize_world_timestamps(self, timestamps_file: Path) -> None:
         if timestamps_file.exists():
             with open(timestamps_file) as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=",")
@@ -67,23 +67,29 @@ class PupilDataLoader:
             self._world_timestamps.append(float(row[0]))
             self.line_count += 1
 
-    def _deserialize_video(self, path: str) -> None:
-        folder = pathlib.Path(path)
-        full_filename = pathlib.Path.joinpath(folder, "world.mp4")
-
+    def _deserialize_video(self, path: str, default_video_name: str) -> None:
+        folder = Path(path)
+        full_filename = Path.joinpath(folder, default_video_name)
+        self._ffmpeg_decode_size(full_filename)
         framebuffer = self._ffmpeg_decode(full_filename)
+        # height = 1088
+        # width = 1080
+        frames = np.frombuffer(framebuffer, np.uint8).reshape([-1, self._world_video_height, self.world_video_width, 3])
 
-        height = 1088
-        width = 1080
-        ndarray = np.frombuffer(framebuffer, np.uint8).reshape([-1, height, width, 3])
+        self._world_videoframes = frames
 
-        self._world_videoframes = ndarray
+    def _ffmpeg_decode_size(self, full_filename: Path) -> None:
+        probe = ffmpeg.probe(full_filename)
+        video = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+        width = int(video['width']) # type: ignore
+        height = int(video['height']) # type: ignore
 
-    def _ffmpeg_decode(self, full_filename: pathlib.Path) -> Any:
+        self._world_video_height = height
+        self._world_video_width = width
 
+    def _ffmpeg_decode(self, full_filename: Path) -> Any:
         replay_rate_input = 1
         log_level = 0
-
         frame_buffer, _ = (
             ffmpeg.input(full_filename, r=replay_rate_input)
                 .output("pipe:", format="rawvideo", pix_fmt="rgb24", **{"loglevel": log_level})
