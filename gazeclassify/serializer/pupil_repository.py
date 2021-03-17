@@ -1,20 +1,20 @@
-import numpy as np # type: ignore
+import numpy as np  # type: ignore
 
-from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
-from gazeclassify.core.model import Dataset, VideoFrame, Metadata, GazeData, DataRecord
 from gazeclassify.core.repository import EyeTrackingDataRepository
+from gazeclassify.core.utils import Readable
+from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 
 
 class PupilInvisibleRepository(EyeTrackingDataRepository):
-    def load_trial(self, path: str) -> Dataset:
+    def load_trial(self, path: str) -> Readable:
         data = PupilDataLoader().load_from_export_folder(path)
 
+        data_dict = {
+            "world timestamps": data.world_timestamps,
+            "world video height": data.world_video_height,
+            "world video width": data.world_video_width,
+            "world video framenumber": data.world_video_framenumber,
+            "folder name": data.foldername
+        }
 
-        # TODO: Manual assembly of Dataset
-        metadata = Metadata("str")
-        world_frame = VideoFrame(1, 1, np.array())
-        gaze = GazeData(1, 1)
-        data_record = DataRecord(0, world_frame, gaze)
-        dataset = Dataset([data_record], metadata)
-
-        return dataset
+        return data_dict

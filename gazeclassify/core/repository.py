@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from gazeclassify.core.model import Dataset
+from gazeclassify.core.utils import Readable
 
 
 class EyeTrackingDataRepository(ABC):
 
     @abstractmethod
-    def load_trial(self, path: str) -> Dataset:
+    def load_trial(self, path: str) -> Readable:
         ...

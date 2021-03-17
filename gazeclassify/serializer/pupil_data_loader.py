@@ -9,14 +9,9 @@ import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
 
 
-def _get_world_timestamps_filepath(path: str) -> Path:
-    folder = Path(path)
-    full_filename = Path.joinpath(folder, "world_timestamps.csv")
-    return full_filename
-
-
 @dataclass
 class PupilDataLoader:
+    _foldername: str = "Video_000"
     _world_video_height: int = 0
     _world_video_width: int = 0
     _world_video_framenumber: int = 0
@@ -27,7 +22,7 @@ class PupilDataLoader:
         return self._world_timestamps
 
     @property
-    def world_videoframes(self) -> Any:
+    def world_videoframes(self) -> np.ndarray:
         return self._world_videoframes
 
     @property
@@ -42,11 +37,25 @@ class PupilDataLoader:
     def world_video_framenumber(self) -> int:
         return self._world_video_framenumber
 
+    @property
+    def foldername(self) -> str:
+        return self._foldername
+
     def load_from_export_folder(self, path: str, default_video_name: str = "world.mp4") -> PupilDataLoader:
-        timestamps_file = _get_world_timestamps_filepath(path)
+        timestamps_file = self._get_world_timestamps_filepath(path)
+        self._get_folder_name(path)
         self._deserialize_world_timestamps(timestamps_file)
         self._deserialize_video(path, default_video_name)
         return self
+
+    def _get_folder_name(self, path: str) -> None:
+        path_to_folder = Path(path)
+        self._foldername = path_to_folder.stem
+
+    def _get_world_timestamps_filepath(self, path: str) -> Path:
+        folder = Path(path)
+        full_filename = Path.joinpath(folder, "world_timestamps.csv")
+        return full_filename
 
     def _deserialize_world_timestamps(self, timestamps_file: Path) -> None:
         if timestamps_file.exists():
@@ -79,8 +88,8 @@ class PupilDataLoader:
     def _ffmpeg_decode_size(self, full_filename: Path) -> None:
         probe = ffmpeg.probe(full_filename)
         video = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-        width = int(video['width']) # type: ignore
-        height = int(video['height']) # type: ignore
+        width = int(video['width'])  # type: ignore
+        height = int(video['height'])  # type: ignore
 
         self._world_video_height = height
         self._world_video_width = width
