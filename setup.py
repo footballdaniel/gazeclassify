@@ -1,12 +1,11 @@
 import setuptools
-import gazeclassify
 
 with open("README.md", "r") as f:
     readme = f.read()
 
 setuptools.setup(
     name="gazeclassify",
-    version="0.3",
+    version="0.2",
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
