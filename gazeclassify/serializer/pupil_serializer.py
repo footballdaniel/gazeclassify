@@ -42,12 +42,18 @@ class TimestampMatcher:
     def match_to_baseline(self, data: List[float]) -> List[float]:
         matched = []
         current_search_index = 0
-        for index, baseline_timestamp in enumerate(data):
+        for index, current_baseline_timestamp in enumerate(self.baseline_timestamps):
 
-            if baseline_timestamp <= data[current_search_index]:
-                matched.append(data[index])
-            else:
+            if current_baseline_timestamp <= self.to_be_matched[current_search_index]:
                 matched.append(data[current_search_index])
-                current_search_index += 1
+            else:
+                if current_search_index < len(data)-1:
+
+                    while (current_baseline_timestamp > self.to_be_matched[current_search_index]) & (current_search_index < len(data)-1):
+                        current_search_index += 1
+
+                    matched.append(data[current_search_index])
+                else:
+                    matched.append(data[-1])
 
         return matched
