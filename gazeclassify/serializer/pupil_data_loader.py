@@ -16,6 +16,9 @@ class PupilDataLoader:
     _world_video_width: int = 0
     _world_video_framenumber: int = 0
     _world_timestamps: List[float] = field(default_factory=list)
+    _gaze_x: List[float] = field(default_factory=list)
+    _gaze_y: List[float] = field(default_factory=list)
+    _gaze_timestamps: List[float] = field(default_factory=list)
 
     @property
     def world_timestamps(self) -> List[float]:
@@ -41,11 +44,24 @@ class PupilDataLoader:
     def foldername(self) -> str:
         return self._foldername
 
+    @property
+    def gaze_x(self) -> List[float]:
+        return self._gaze_x
+
+    @property
+    def gaze_y(self) -> List[float]:
+        return self._gaze_y
+
+    @property
+    def gaze_timestamps(self) -> List[float]:
+        return self._gaze_timestamps
+
     def load_from_export_folder(self, path: str, default_video_name: str = "world.mp4") -> PupilDataLoader:
         timestamps_file = self._get_world_timestamps_filepath(path)
         self._get_folder_name(path)
         self._deserialize_world_timestamps(timestamps_file)
         self._deserialize_video(path, default_video_name)
+        self._deserialize_gaze_data(path)
         return self
 
     def _get_folder_name(self, path: str) -> None:
@@ -63,13 +79,13 @@ class PupilDataLoader:
                 csv_reader = csv.reader(csv_file, delimiter=",")
                 self.line_count = 0
                 for row in csv_reader:
-                    self._read_lines(self.line_count, row)
+                    self._read_world_timestamps_lines(self.line_count, row)
         else:
             raise FileNotFoundError(
                 "Could not find the file world_timestamps.csv in folder"
             )
 
-    def _read_lines(self, line_count: int, row: List[str]) -> None:
+    def _read_world_timestamps_lines(self, line_count: int, row: List[str]) -> None:
         if self.line_count == 0:
             self.line_count += 1
         else:
@@ -104,3 +120,32 @@ class PupilDataLoader:
         )
         print(type(frame_buffer))
         return frame_buffer
+
+    def _deserialize_gaze_data(self, path: str) -> None:
+        full_filename = self._get_gaze_positions_filepath(path)
+        if full_filename.exists():
+            with open(full_filename) as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=",")
+                self.line_count = 0
+                for row in csv_reader:
+                    self._read_gaze_data_lines(self.line_count, row)
+        else:
+            raise FileNotFoundError(
+                "Could not find the file world_timestamps.csv in folder"
+            )
+
+    def _read_gaze_data_lines(self, line_count: int, row: List[str]) -> None:
+        if self.line_count == 0:
+            self._column_gaze_x = [i for i, element in enumerate(row) if 'norm_pos_x' in element][0]
+            self._column_gaze_y = [i for i, element in enumerate(row) if 'norm_pos_y' in element][0]
+            self.line_count += 1
+        else:
+            self._gaze_x.append(float(row[self._column_gaze_x]))
+            self._gaze_y.append(float(row[self._column_gaze_y]))
+            self._gaze_timestamps.append(float(row[0]))
+            self.line_count += 1
+
+    def _get_gaze_positions_filepath(self, path: str) -> Path:
+        folder = Path(path)
+        full_filename = Path.joinpath(folder, "gaze_positions.csv")
+        return full_filename

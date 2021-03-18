@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
@@ -5,8 +7,8 @@ from gazeclassify.core.model import Dataset
 from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
 
 
-def load_from_pupil_invisible(path: str) -> Dataset:
-    dataset = PupilInvisibleRepository().load_trial(path)
+def load_from_pupil_invisible(path: str) -> Any:
+    dataset = PupilInvisibleRepository().load_capture(path)
     return dataset
 
 

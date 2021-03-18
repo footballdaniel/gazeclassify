@@ -41,3 +41,9 @@ class Test_PupilDataLoader_Video:
         assert width == 1088
         assert height == 1080
         assert number_of_frames == 2
+
+
+class Test_PupilDataLoader_GazeData:
+    def test_if_can_read_gaze_column_from_textfile(self) -> None:
+        loader = PupilDataLoader().load_from_export_folder("gazeclassify/tests/data/", "frame.mp4")
+        assert len(loader.gaze_x) == 145
