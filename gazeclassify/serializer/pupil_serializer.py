@@ -11,7 +11,6 @@ from gazeclassify.core.utils import Readable
 class PupilDataSerializer(Serializer):
 
     def deserialize(self, inputs: Dict[str, Readable]) -> Dataset:
-
         world_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
         gaze_timestamps = self._readable_to_list_of_floats(inputs['gaze timestamps'])
         gaze_x = self._readable_to_list_of_floats(inputs['gaze x'])
@@ -41,14 +40,14 @@ class TimestampMatcher:
     to_be_matched: List[float]
 
     def match_to_baseline(self, data: List[float]) -> List[float]:
-        matched = data
+        matched = []
+        current_search_index = 0
+        for index, baseline_timestamp in enumerate(data):
+
+            if baseline_timestamp <= data[current_search_index]:
+                matched.append(data[index])
+            else:
+                matched.append(data[current_search_index])
+                current_search_index += 1
 
         return matched
-
-
-
-
-
-
-
-
