@@ -9,7 +9,7 @@ import numpy as np  # type: ignore
 
 
 @contextmanager
-def performance_logging(description: str, logger: Optional[Logger]) -> Iterator[None]:
+def performance_logging(description: str, logger: Optional[Logger] = None) -> Iterator[None]:
     start = time.time()
     try:
         yield
