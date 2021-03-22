@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np  # type: ignore
 
 from gazeclassify.core.repository import EyeTrackingDataRepository
@@ -6,7 +8,7 @@ from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 
 
 class PupilInvisibleRepository(EyeTrackingDataRepository):
-    def load_capture(self, path: str) -> Readable:
+    def load_capture(self, path: str) -> Dict[str, Readable]:
         data = PupilDataLoader().load_from_export_folder(path)
 
         data_dict = {
