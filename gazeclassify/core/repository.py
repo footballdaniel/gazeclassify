@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, BinaryIO
 
 from gazeclassify.core.video import FrameSeeker
-from gazeclassify.core.utils import Readable
-
 
 class EyeTrackingDataRepository(ABC):
 
     @abstractmethod
-    def load_gaze_data(self) -> Readable:
+    def load_gaze_data(self) -> Dict[str, BinaryIO]:
         ...
 
     @abstractmethod

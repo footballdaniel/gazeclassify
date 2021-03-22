@@ -22,6 +22,7 @@ class Metadata:
 class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
+    video: FrameSeeker
 
 
 @dataclass
@@ -34,7 +35,6 @@ class DataRecord:
 @dataclass
 class VideoFrame:
     frame_index: int
-    frame: FrameSeeker
 
 
 @dataclass

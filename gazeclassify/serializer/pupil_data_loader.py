@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, BinaryIO
 
 import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
@@ -55,6 +55,17 @@ class PupilDataLoader:
     @property
     def gaze_timestamps(self) -> List[float]:
         return self._gaze_timestamps
+
+
+    def access_gaze_file(self, path: str) -> BinaryIO:
+        full_filename = self._get_gaze_positions_filepath(path)
+        gaze_stream = open(full_filename, 'rb')
+        return gaze_stream
+
+    def access_world_timestamps(self, path: str) -> BinaryIO:
+        full_filename = self._get_world_timestamps_filepath(path)
+        timestamps_stream = open(full_filename, 'rb')
+        return timestamps_stream
 
     def load_from_export_folder(self, path: str, default_video_name: str = "world.mp4") -> PupilDataLoader:
         timestamps_file = self._get_world_timestamps_filepath(path)

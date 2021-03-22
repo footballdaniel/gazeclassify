@@ -1,13 +1,11 @@
 import io
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Dict, BinaryIO
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 
 from gazeclassify.core.repository import EyeTrackingDataRepository
-from gazeclassify.core.utils import Readable
 from gazeclassify.core.video import FrameSeeker
 from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 
@@ -46,20 +44,17 @@ class OpenCVFrameSeeker(FrameSeeker):
 class PupilInvisibleRepository(EyeTrackingDataRepository):
     folder_path: str
 
-    def load_gaze_data(self) -> Dict[str, Readable]:
-        data = PupilDataLoader().load_from_export_folder(self.folder_path)
-        data_dict = {
-            "world timestamps": data.world_timestamps,
-            "world video height": data.world_video_height,
-            "world video width": data.world_video_width,
-            "world video framenumber": data.world_video_framenumber,
-            "folder name": data.foldername,
-            "gaze x": data.gaze_x,
-            "gaze y": data.gaze_y,
-            "gaze timestamps": data.gaze_timestamps,
-            "world video frames": data.world_videoframes
+    def load_gaze_data(self) -> Dict[str, BinaryIO]:
+        loader = PupilDataLoader()
+
+        gaze_filestream = loader.access_gaze_file(self.folder_path)
+        world_timestamps_filestream = loader.access_world_timestamps(self.folder_path)
+
+        filestream_dict = {
+            "gaze location": gaze_filestream,
+            "world timestamps": world_timestamps_filestream
         }
-        return data_dict
+        return filestream_dict
 
     def load_video_capture(self) -> FrameSeeker:
         frame_seeker = OpenCVFrameSeeker(self.folder_path)
