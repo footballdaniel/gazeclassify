@@ -1,47 +1,59 @@
+import logging
 import sys
+import time
 from contextlib import contextmanager
-from time import time
+from logging import Logger
+from typing import Iterator, Optional, Set
 
 
 @contextmanager
-def performance_logging(description: str, logger=None) -> None:
+def performance_logging(description: str, logger: Optional[Logger]) -> Iterator[None]:
     start = time.time()
     try:
         yield
     finally:
         took = (time.time() - start) * 1000
         unit = "ms"
-
-        msg = f"{description} took: {took:.2f}{unit}"
+        if took < 0.1:
+            took *= 1000
+            unit = "us"
+        message = f"{description} took: {took:.2f}{unit}"
         if logger:
-            logger.info(msg)
+            logger.info(message)
         else:
-            print(msg)
+            print(message)
 
 
-
-def memory_logging(obj, recursively_seen=None) -> None:
+def inspect_recursively(instance: object, recursively_seen: Optional[Set[int]] = set()) -> int:
     if recursively_seen is None:
         recursively_seen = set()
-    size = sys.getsizeof(obj)
-    obj_id = id(obj)
-
+    size = sys.getsizeof(instance)
+    obj_id = id(instance)
     if obj_id in recursively_seen:
         return 0
-
     recursively_seen.add(obj_id)
-    if isinstance(obj, dict):
-        size += sum([memory_logging(v, recursively_seen) for v in obj.values()])
-        size += sum([memory_logging(k, recursively_seen) for k in obj.keys()])
-
-    elif hasattr(obj, '__dict__'):
-        size += memory_logging(obj.__dict__, recursively_seen)
-
-    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
-        size += sum([memory_logging(i, recursively_seen) for i in obj])
+    if isinstance(instance, dict):
+        size += sum([inspect_recursively(v, recursively_seen) for v in instance.values()])
+        size += sum([inspect_recursively(k, recursively_seen) for k in instance.keys()])
+    elif hasattr(instance, '__dict__'):
+        size += inspect_recursively(instance.__dict__, recursively_seen)
+    elif hasattr(instance, '__iter__') and not isinstance(instance, (str, bytes, bytearray)):
+        size += sum([inspect_recursively(i, recursively_seen) for i in instance])  # type: ignore
     return size
 
 
-d = {}
-
-print(memory_logging(d))
+@contextmanager
+def memory_allocation(description: str, instance: object, logger: Optional[Logger] = None) -> Iterator[None]:
+    initial_size = float(inspect_recursively(instance))
+    initial_size /= 1000
+    try:
+        yield
+    finally:
+        final_size = float(inspect_recursively(instance))
+        final_size /= 1000
+        unit = "kilobytes"
+        message = f"{description} increased memory size from: {initial_size:.1f} {unit} to {final_size:.1f} {unit}"
+        if logger:
+            logging.info(message)
+        else:
+            print(message)
