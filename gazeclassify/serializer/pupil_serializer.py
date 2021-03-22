@@ -18,6 +18,7 @@ class PupilDataSerializer(Serializer):
         world_video_width = inputs['world video width']
         world_video_height = inputs['world video height']
         world_video_framenumber = inputs['world video framenumber']
+        world_video_frames = inputs['world video frames']
         world_video_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
 
         matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
@@ -26,12 +27,26 @@ class PupilDataSerializer(Serializer):
 
         folder_name = inputs['folder name']
 
-        # placeholder to return dataset
-        metadata = Metadata("str")
-        world_frame = VideoFrame(1, 1, np.array())
-        gaze = GazeData(1, 1)
-        data_record = DataRecord(0, world_frame, gaze)
-        dataset = Dataset([data_record], metadata)
+        data_records = []
+        for index, _ in enumerate(world_video_timestamps):
+            world_timestamp = world_video_timestamps[index]
+            video = world_video_frames[index, :, :, :]
+
+            gaze = GazeData(
+                gaze_x[index],
+                gaze_y[index]
+            )
+
+            record = DataRecord(
+                world_timestamp,
+                video,
+                gaze
+            )
+
+            data_records.append(record)
+
+        metadata = Metadata(folder_name)
+        dataset = Dataset(data_records, metadata)
         return dataset
 
     def _readable_to_list_of_floats(self, inputs: Readable) -> List[float]:

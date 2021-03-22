@@ -17,7 +17,8 @@ class PupilInvisibleRepository(EyeTrackingDataRepository):
             "folder name": data.foldername,
             "gaze x": data.gaze_x,
             "gaze y": data.gaze_y,
-            "gaze timestamps": data.gaze_timestamps
+            "gaze timestamps": data.gaze_timestamps,
+            "world video frames": data.world_videoframes
         }
 
         return data_dict

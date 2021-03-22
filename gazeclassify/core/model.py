@@ -21,7 +21,7 @@ class Dataset(ABC):
 @dataclass
 class DataRecord:
     world_timestamp: float
-    world_frame: VideoFrame
+    video: VideoFrame
     gaze: GazeData
 
 
