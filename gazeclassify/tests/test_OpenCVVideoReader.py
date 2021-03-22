@@ -1,9 +1,9 @@
 import io
 from dataclasses import dataclass
 
-import cv2
-import numpy as np
-from PIL import Image
+import cv2  # type: ignore
+import numpy as np  # type: ignore
+from PIL import Image  # type: ignore
 
 from gazeclassify.utils import performance_logging
 
@@ -85,14 +85,3 @@ class TestOpenCVVideoReader:
         writer.write(frame)
         writer.release()
 
-
-with performance_logging("reading Opencv"):
-    TestOpenCVVideoReader().test_read_videoframe_to_bytes_to_bytesIO_back_to_bytes_and_back_to_image()
-
-#
-#         codec = cv2.VideoWriter_fourcc(*'DIVX')
-# width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-# height =
-# fps = capture.get(cv2.CAP_PROP_FPS)
-
-#
