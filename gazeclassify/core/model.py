@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from dataclasses import dataclass
 from typing import List
 
@@ -12,7 +13,7 @@ class Metadata:
 
 
 @dataclass
-class Dataset:
+class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
 

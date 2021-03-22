@@ -11,14 +11,20 @@ from gazeclassify.core.utils import Readable
 class PupilDataSerializer(Serializer):
 
     def deserialize(self, inputs: Dict[str, Readable]) -> Dataset:
-        world_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
-        gaze_timestamps = self._readable_to_list_of_floats(inputs['gaze timestamps'])
-        gaze_x = self._readable_to_list_of_floats(inputs['gaze x'])
-        gaze_y = self._readable_to_list_of_floats(inputs['gaze y'])
+        gaze_timestamps_raw = self._readable_to_list_of_floats(inputs['gaze timestamps'])
+        gaze_x_raw = self._readable_to_list_of_floats(inputs['gaze x'])
+        gaze_y_raw = self._readable_to_list_of_floats(inputs['gaze y'])
 
-        matcher = TimestampMatcher(world_timestamps, gaze_timestamps)
-        gaze_x = matcher.match_to_base_framerate(gaze_x)
-        gaze_y = matcher.match_to_base_framerate(gaze_y)
+        world_video_width = inputs['world video width']
+        world_video_height = inputs['world video height']
+        world_video_framenumber = inputs['world video framenumber']
+        world_video_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
+
+        matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
+        gaze_x = matcher.match_to_base_framerate(gaze_x_raw)
+        gaze_y = matcher.match_to_base_framerate(gaze_y_raw)
+
+        folder_name = inputs['folder name']
 
         # placeholder to return dataset
         metadata = Metadata("str")

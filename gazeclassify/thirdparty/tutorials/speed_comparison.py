@@ -1,7 +1,7 @@
 from pathlib import Path
-from gazeclassify.thirdparty.modeldownload import ModelDownload
+from gazeclassify.thirdparty.pixellib.modeldownload import ModelDownload
 from pixellib.instance import instance_segmentation  # type: ignore
-from gazeclassify.thirdparty.helpers import InferSpeed
+from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 import time
 import tensorflow as tf  # type: ignore
 import logging
