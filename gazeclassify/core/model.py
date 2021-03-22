@@ -6,13 +6,16 @@ from typing import List
 
 import numpy as np  # type: ignore
 
+from gazeclassify.core.video import FrameSeeker
+
 
 @dataclass
 class Metadata:
     recording_name: str
     world_video_width: int
     world_video_height: int
-    world_video_framenumber: int
+    world_video_frame_number: int
+    world_video_frame_rate: int
 
 
 @dataclass
@@ -30,12 +33,14 @@ class DataRecord:
 
 @dataclass
 class VideoFrame:
-    width: int
-    height: int
-    frame: np.ndarray
+    frame_index: int
+    frame: FrameSeeker
 
 
 @dataclass
 class GazeData:
     x: float
     y: float
+
+
+

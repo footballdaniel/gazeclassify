@@ -4,26 +4,28 @@ from typing import Dict, Tuple, List, cast
 
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model import Dataset, Metadata, GazeData, DataRecord
+from gazeclassify.core.model import Dataset, Metadata, GazeData, DataRecord, VideoFrame
 from gazeclassify.core.serialization import Serializer
 from gazeclassify.core.utils import Readable
-
+from gazeclassify.core.video import FrameSeeker
 from gazeclassify.utils import memory_logging
 
 
 class PupilDataSerializer(Serializer):
 
-    def deserialize(self, inputs: Dict[str, Readable]) -> Dataset:
-        logger = logging.getLogger(__name__)
-
+    def deserialize(
+            self,
+            inputs: Dict[str, Readable],
+            video_metadata: Dict[str, int],
+            video_capture: FrameSeeker) -> Dataset:
         gaze_timestamps_raw = self._readable_to_list_of_floats(inputs['gaze timestamps'])
         gaze_x_raw = self._readable_to_list_of_floats(inputs['gaze x'])
         gaze_y_raw = self._readable_to_list_of_floats(inputs['gaze y'])
 
-        world_video_width = self._readable_to_int(inputs['world video width'])
-        world_video_height = self._readable_to_int(inputs['world video height'])
-        world_video_framenumber = self._readable_to_int(inputs['world video framenumber'])
-        world_video_frames = self._readable_to_ndarray(inputs['world video frames'])
+        world_video_width = video_metadata['width']
+        world_video_height = video_metadata['height']
+        world_video_frame_number = video_metadata['frame number']
+        world_video_frame_rate = video_metadata['frame rate']
         world_video_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
 
         matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
@@ -35,17 +37,21 @@ class PupilDataSerializer(Serializer):
         data_records = []
         for index, _ in enumerate(world_video_timestamps):
             world_timestamp = world_video_timestamps[index]
-            video = world_video_frames[index, :, :, :]
 
-            gaze = GazeData(
+            video_frame = VideoFrame(
+                frame_index=index,
+                frame=video_capture
+            )
+
+            gaze_data = GazeData(
                 gaze_x[index],
                 gaze_y[index]
             )
 
             record = DataRecord(
                 world_timestamp,
-                video,
-                gaze
+                video_frame,
+                gaze_data
             )
 
             data_records.append(record)
@@ -54,14 +60,15 @@ class PupilDataSerializer(Serializer):
             folder_name,
             world_video_width,
             world_video_height,
-            world_video_framenumber
+            world_video_frame_number,
+            world_video_frame_rate
         )
 
         dataset = Dataset(data_records, metadata)
 
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')
-        memory_logging("Size of dataset", dataset, logger)
+        memory_logging("Size of deserialized dataset", dataset, logger)
 
         return dataset
 

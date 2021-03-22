@@ -4,10 +4,17 @@ import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
+from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
 
 
 def load_from_pupil_invisible(path: str) -> Any:
-    dataset = PupilInvisibleRepository().load_capture(path)
+    file_repository = PupilInvisibleRepository(path)
+    gaze_data = file_repository.load_gaze_data()
+    video_capture = file_repository.load_video_capture()
+    video_metadata = file_repository.load_video_metadata()
+
+    serializer = PupilDataSerializer()
+    dataset = serializer.deserialize(gaze_data, video_metadata, video_capture)
     return dataset
 
 
@@ -19,3 +26,6 @@ def segment_with_pixellib() -> None:
         frames_per_second=20,
         output_video_name="output.mp4",
     )
+
+
+load_from_pupil_invisible("gazeclassify/tests/data")

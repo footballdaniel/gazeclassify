@@ -20,10 +20,11 @@ class TestOpenCVVideoReader:
     def test_read_two_video_frames_opencv_results_in_two_frames(self) -> None:
         capture = cv2.VideoCapture("gazeclassify/tests/data/two_frames.mp4")
         frame_counter = -1
-        has_frame = True
-        while has_frame:
-            frame_counter += 1
+        while True:
             has_frame, frame = capture.read()
+            frame_counter += 1
+            if not has_frame:
+                break
         assert frame_counter == 2
 
     def test_read_videoframe_to_bytes_and_back_to_image(self) -> None:
