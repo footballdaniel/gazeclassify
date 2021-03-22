@@ -10,7 +10,6 @@ from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
 class PupilInvisibleRepository(EyeTrackingDataRepository):
     def load_capture(self, path: str) -> Dict[str, Readable]:
         data = PupilDataLoader().load_from_export_folder(path)
-
         data_dict = {
             "world timestamps": data.world_timestamps,
             "world video height": data.world_video_height,
@@ -22,5 +21,4 @@ class PupilInvisibleRepository(EyeTrackingDataRepository):
             "gaze timestamps": data.gaze_timestamps,
             "world video frames": data.world_videoframes
         }
-
         return data_dict

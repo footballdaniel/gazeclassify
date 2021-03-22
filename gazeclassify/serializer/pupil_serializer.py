@@ -20,9 +20,9 @@ class PupilDataSerializer(Serializer):
         gaze_x_raw = self._readable_to_list_of_floats(inputs['gaze x'])
         gaze_y_raw = self._readable_to_list_of_floats(inputs['gaze y'])
 
-        world_video_width = self._readable_to_list_of_floats(inputs['world video width'])
-        world_video_height = self._readable_to_list_of_floats(inputs['world video height'])
-        world_video_framenumber = self._readable_to_list_of_floats(inputs['world video framenumber'])
+        world_video_width = self._readable_to_int(inputs['world video width'])
+        world_video_height = self._readable_to_int(inputs['world video height'])
+        world_video_framenumber = self._readable_to_int(inputs['world video framenumber'])
         world_video_frames = self._readable_to_ndarray(inputs['world video frames'])
         world_video_timestamps = self._readable_to_list_of_floats(inputs['world timestamps'])
 
@@ -59,7 +59,9 @@ class PupilDataSerializer(Serializer):
 
         dataset = Dataset(data_records, metadata)
 
-        memory_logging("Size of dataset", dataset)
+        logger = logging.getLogger(__name__)
+        logger.setLevel('INFO')
+        memory_logging("Size of dataset", dataset, logger)
 
         return dataset
 
@@ -73,6 +75,10 @@ class PupilDataSerializer(Serializer):
 
     def _readable_to_ndarray(self, inputs: Readable) -> np.ndarray:
         transformed_inputs: np.ndarray = cast(np.ndarray, inputs)
+        return transformed_inputs
+
+    def _readable_to_int(self, inputs: Readable) -> int:
+        transformed_inputs: int = cast(int, inputs)
         return transformed_inputs
 
     def serialize(self) -> Tuple[str, str]:

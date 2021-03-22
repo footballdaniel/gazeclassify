@@ -98,7 +98,6 @@ class PupilDataLoader:
         self._ffmpeg_decode_size(full_filename)
         framebuffer = self._ffmpeg_decode(full_filename)
         frames = np.frombuffer(framebuffer, np.uint8).reshape([-1, self._world_video_width, self.world_video_height, 3])
-
         self._world_videoframes = frames
 
     def _ffmpeg_decode_size(self, full_filename: Path) -> None:
@@ -118,7 +117,6 @@ class PupilDataLoader:
                 .output("pipe:", format="rawvideo", pix_fmt="rgb24", **{"loglevel": log_level})
                 .run(capture_stdout=True)
         )
-        print(type(frame_buffer))
         return frame_buffer
 
     def _deserialize_gaze_data(self, path: str) -> None:

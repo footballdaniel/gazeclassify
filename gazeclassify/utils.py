@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from logging import Logger
 from typing import Iterator, Optional, Set
 
-import numpy as np
+import numpy as np  # type: ignore
 
 
 @contextmanager
