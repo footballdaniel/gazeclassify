@@ -10,6 +10,9 @@ import numpy as np  # type: ignore
 @dataclass
 class Metadata:
     recording_name: str
+    world_video_width: int
+    world_video_height: int
+    world_video_framenumber: int
 
 
 @dataclass
@@ -34,5 +37,5 @@ class VideoFrame:
 
 @dataclass
 class GazeData:
-    x: int
-    y: int
+    x: float
+    y: float

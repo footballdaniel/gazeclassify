@@ -5,6 +5,8 @@ from contextlib import contextmanager
 from logging import Logger
 from typing import Iterator, Optional, Set
 
+import numpy as np
+
 
 @contextmanager
 def performance_logging(description: str, logger: Optional[Logger]) -> Iterator[None]:
@@ -32,7 +34,9 @@ def inspect_recursively(instance: object, recursively_seen: Optional[Set[int]] =
     if obj_id in recursively_seen:
         return 0
     recursively_seen.add(obj_id)
-    if isinstance(instance, dict):
+    if isinstance(instance, np.ndarray):
+        size += instance.nbytes
+    elif isinstance(instance, dict):
         size += sum([inspect_recursively(v, recursively_seen) for v in instance.values()])
         size += sum([inspect_recursively(k, recursively_seen) for k in instance.keys()])
     elif hasattr(instance, '__dict__'):
@@ -42,18 +46,12 @@ def inspect_recursively(instance: object, recursively_seen: Optional[Set[int]] =
     return size
 
 
-@contextmanager
-def memory_allocation(description: str, instance: object, logger: Optional[Logger] = None) -> Iterator[None]:
-    initial_size = float(inspect_recursively(instance))
-    initial_size /= 1000
-    try:
-        yield
-    finally:
-        final_size = float(inspect_recursively(instance))
-        final_size /= 1000
-        unit = "kilobytes"
-        message = f"{description} increased memory size from: {initial_size:.1f} {unit} to {final_size:.1f} {unit}"
-        if logger:
-            logging.info(message)
-        else:
-            print(message)
+def memory_logging(description: str, instance: object, logger: Optional[Logger] = None) -> None:
+    object_size = float(inspect_recursively(instance))
+    object_size /= 1000
+    unit = "kilobytes"
+    message = f"{description} size: {object_size:.1f} {unit}"
+    if logger:
+        logging.info(message)
+    else:
+        print(message)
