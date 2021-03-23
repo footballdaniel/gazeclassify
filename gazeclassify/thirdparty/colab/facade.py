@@ -10,11 +10,10 @@ from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
 def load_from_pupil_invisible(path: str) -> Any:
     file_repository = PupilInvisibleRepository(path)
     gaze_data = file_repository.load_gaze_data()
-    video_capture = file_repository.load_video_capture()
     video_metadata = file_repository.load_video_metadata()
 
     serializer = PupilDataSerializer()
-    dataset = serializer.deserialize(gaze_data, video_metadata, video_capture)
+    dataset = serializer.deserialize(gaze_data, video_metadata)
     return dataset
 
 

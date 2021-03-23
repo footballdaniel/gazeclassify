@@ -26,11 +26,6 @@ class PupilInvisibleRepository(EyeTrackingDataRepository):
         }
         return filestream_dict
 
-    def load_video_capture(self) -> FrameReader:
-        frame_seeker = OpenCVFrameReader(self.folder_path)
-        frame_seeker.open_capture()
-        return frame_seeker
-
     def load_video_metadata(self) -> Dict[str, int]:
         video_file = self._get_file_name(self.folder_path)
         capture = cv2.VideoCapture(video_file)

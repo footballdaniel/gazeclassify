@@ -2,6 +2,7 @@ import csv
 import io
 import logging
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, Tuple, List, BinaryIO
 
 import numpy as np  # type: ignore
@@ -77,16 +78,12 @@ class GazeDeserializer:
 
 class PupilDataSerializer(Serializer):
 
-    def deserialize(
-            self,
-            inputs: Dict[str, BinaryIO],
-            video_metadata: Dict[str, int],
-            video_capture: FrameReader) -> Dataset:
-        timestamps = TimestampsDeserializer(inputs['world timestamps'])
+    def deserialize(self, gaze_data: Dict[str, BinaryIO], video_metadata: Dict[str, int]) -> Dataset:
+        timestamps = TimestampsDeserializer(gaze_data['world timestamps'])
         timestamps.deserialize()
         world_video_timestamps = timestamps.world_timestamps
 
-        gaze = GazeDeserializer(inputs['gaze location'])
+        gaze = GazeDeserializer(gaze_data['gaze location'])
         gaze.deserialize()
         gaze_timestamps_raw = gaze.gaze_timestamps_raw
         gaze_x_raw = gaze.gaze_x_raw
@@ -107,7 +104,7 @@ class PupilDataSerializer(Serializer):
 
             video_frame = VideoFrame(index)
 
-            gaze_data = GazeData(
+            gaze_location = GazeData(
                 gaze_x[index],
                 gaze_y[index]
             )
@@ -115,20 +112,21 @@ class PupilDataSerializer(Serializer):
             record = DataRecord(
                 world_timestamp,
                 video_frame,
-                gaze_data
+                gaze_location
             )
 
             data_records.append(record)
 
-        metadata = Metadata(
-            "TOBEDONE FOLDERNAME",
-            world_video_width,
-            world_video_height,
-            world_video_frame_number,
-            world_video_frame_rate
-        )
+        video_path = Path("TOBEDONE")
 
-        video = video_capture
+        metadata = Metadata(
+            recording_name="TOBEDONEFOLDERNAME",
+            world_video_file=video_path,
+            world_video_width=world_video_width,
+            world_video_height=world_video_height,
+            world_video_frame_number=world_video_frame_number,
+            world_video_frame_rate=world_video_frame_rate
+        )
 
         dataset = Dataset(data_records, metadata)
 

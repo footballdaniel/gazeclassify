@@ -8,7 +8,7 @@ from gazeclassify.core.services.video import FrameReader
 class Serializer(ABC):
 
     @abstractmethod
-    def deserialize(self, inputs: Dict[str, BinaryIO], video_metadata: Dict[str, int], video_capture: FrameReader) -> Dataset:
+    def deserialize(self, gaze_data: Dict[str, BinaryIO], video_metadata: Dict[str, int]) -> Dataset:
         ...
 
     @abstractmethod
