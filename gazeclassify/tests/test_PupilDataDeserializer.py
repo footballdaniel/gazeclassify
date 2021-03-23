@@ -1,7 +1,5 @@
 from unittest.mock import MagicMock, PropertyMock
 
-from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
-
 
 class Test_MockPupilDataDeSerializer:
     def test_instantiate_datarecords(self) -> None:
@@ -12,6 +10,4 @@ class Test_MockPupilDataDeSerializer:
         p = PropertyMock(return_value=[0])
         type(pupilDataLoader).world_timestamps = p
 
-        serializer = PupilDataSerializer()
-        print("WARNING WRITE TEST")
         assert pupilDataLoader.world_timestamps == [0]

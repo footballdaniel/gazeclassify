@@ -1,7 +1,7 @@
 import csv
 import io
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Tuple, List, BinaryIO
 
 import numpy as np  # type: ignore
@@ -15,7 +15,7 @@ from gazeclassify.utils import memory_logging
 @dataclass
 class TimestampsDeserializer:
     file_stream: BinaryIO
-    _world_timestamps: List[float] = []
+    _world_timestamps: List[float] = field(default_factory=list)
 
     @property
     def world_timestamps(self) -> List[float]:
@@ -36,12 +36,13 @@ class TimestampsDeserializer:
             self._world_timestamps.append(float(row[0]))
             self.line_count += 1
 
+
 @dataclass
 class GazeDeserializer:
     file_stream: BinaryIO
-    _gaze_timestamps: List[float] = []
-    _gaze_x: List[float] = []
-    _gaze_y: List[float] = []
+    _gaze_timestamps: List[float] = field(default_factory=list)
+    _gaze_x: List[float] = field(default_factory=list)
+    _gaze_y: List[float] = field(default_factory=list)
 
     @property
     def gaze_timestamps_raw(self) -> List[float]:
@@ -81,7 +82,6 @@ class PupilDataSerializer(Serializer):
             inputs: Dict[str, BinaryIO],
             video_metadata: Dict[str, int],
             video_capture: FrameSeeker) -> Dataset:
-
         timestamps = TimestampsDeserializer(inputs['world timestamps'])
         timestamps.deserialize()
         world_video_timestamps = timestamps.world_timestamps
@@ -93,8 +93,8 @@ class PupilDataSerializer(Serializer):
         gaze_y_raw = gaze.gaze_y_raw
 
         matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
-        gaze_x = matcher.match_to_base_framerate(gaze_x_raw)
-        gaze_y = matcher.match_to_base_framerate(gaze_y_raw)
+        gaze_x = matcher.match_to_base_frame_rate(gaze_x_raw)
+        gaze_y = matcher.match_to_base_frame_rate(gaze_y_raw)
 
         world_video_width = video_metadata['width']
         world_video_height = video_metadata['height']
@@ -138,22 +138,6 @@ class PupilDataSerializer(Serializer):
 
         return dataset
 
-    # def _readable_to_list_of_floats(self, inputs: Readable) -> List[float]:
-    #     transformed_inputs: List[float] = cast(List[float], inputs)
-    #     return transformed_inputs
-    #
-    # def _readable_to_string(self, inputs: Readable) -> str:
-    #     transformed_inputs: str = cast(str, inputs)
-    #     return transformed_inputs
-    #
-    # def _readable_to_ndarray(self, inputs: Readable) -> np.ndarray:
-    #     transformed_inputs: np.ndarray = cast(np.ndarray, inputs)
-    #     return transformed_inputs
-    #
-    # def _readable_to_int(self, inputs: Readable) -> int:
-    #     transformed_inputs: int = cast(int, inputs)
-    #     return transformed_inputs
-
     def serialize(self) -> Tuple[str, str]:
         raise NotImplementedError
 
@@ -161,24 +145,32 @@ class PupilDataSerializer(Serializer):
 @dataclass
 class TimestampMatcher:
     baseline_timestamps: List[float]
-    to_be_matched: List[float]
+    to_be_matched_data: List[float]
+    matched_timestamps: List[float] = field(default_factory=list)
+    _search_index: int = 0
 
-    def match_to_base_framerate(self, data: List[float]) -> List[float]:
-        matched = []
-        current_search_index = 0
-        for index, current_baseline_timestamp in enumerate(self.baseline_timestamps):
+    def match_to_base_frame_rate(self, data: List[float]) -> List[float]:
+        for current_baseline_timestamp in self.baseline_timestamps:
+            self._match_data_to_baseline_index(current_baseline_timestamp, data)
+        return self.matched_timestamps
 
-            if current_baseline_timestamp <= self.to_be_matched[current_search_index]:
-                matched.append(data[current_search_index])
+    def _match_data_to_baseline_index(self, current_baseline_timestamp, data):
+        if self._is_data_timestamp_higher_than(current_baseline_timestamp):
+            self.matched_timestamps.append(data[self._search_index])
+        else:
+            if self._has_not_ended(data):
+                while (current_baseline_timestamp > self.to_be_matched_data[self._search_index]) & (
+                        self._search_index < len(data) - 1):
+                    self._search_index += 1
+
+                self.matched_timestamps.append(data[self._search_index])
             else:
-                if current_search_index < len(data) - 1:
+                self.matched_timestamps.append(data[-1])
 
-                    while (current_baseline_timestamp > self.to_be_matched[current_search_index]) & (
-                            current_search_index < len(data) - 1):
-                        current_search_index += 1
+    def _has_not_ended(self, data: float) -> bool:
+        has_not_ended = self._search_index < len(data) - 1
+        return has_not_ended
 
-                    matched.append(data[current_search_index])
-                else:
-                    matched.append(data[-1])
-
-        return matched
+    def _is_data_timestamp_higher_than(self, current_baseline_timestamp: float) -> bool:
+        is_ahead = current_baseline_timestamp <= self.to_be_matched_data[self._search_index]
+        return is_ahead

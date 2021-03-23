@@ -14,7 +14,7 @@ class PupilDataLoader:
     _foldername: str = "Video_000"
     _world_video_height: int = 0
     _world_video_width: int = 0
-    _world_video_framenumber: int = 0
+    _world_video_frame_number: int = 0
     _world_timestamps: List[float] = field(default_factory=list)
     _gaze_x: List[float] = field(default_factory=list)
     _gaze_y: List[float] = field(default_factory=list)
@@ -38,7 +38,7 @@ class PupilDataLoader:
 
     @property
     def world_video_framenumber(self) -> int:
-        return self._world_video_framenumber
+        return self._world_video_frame_number
 
     @property
     def foldername(self) -> str:
