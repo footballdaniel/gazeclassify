@@ -5,8 +5,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
-from gazeclassify.core.services.analysis import AnalysisState
-
 
 @dataclass
 class Metadata:

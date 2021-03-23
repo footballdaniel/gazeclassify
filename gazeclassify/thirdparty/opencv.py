@@ -43,8 +43,6 @@ class OpenCVFrameReader(FrameReader):
 
 @dataclass
 class OpenCVFrameWriter(FrameWriter):
-
-
     output_video_name: str = ""
     codec: str = 'DIVX'
     frames_per_second: int = 25
