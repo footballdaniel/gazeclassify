@@ -1,13 +1,11 @@
 from dataclasses import dataclass
-from typing import Dict, BinaryIO, Union
+from typing import Dict, BinaryIO
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 
-from gazeclassify.core.repository import EyeTrackingDataRepository
-from gazeclassify.core.services.video import FrameReader
+from gazeclassify.core.model.repository import EyeTrackingDataRepository
 from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
-from gazeclassify.thirdparty.opencv import OpenCVFrameReader
 
 
 @dataclass

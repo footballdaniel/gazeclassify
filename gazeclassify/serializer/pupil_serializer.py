@@ -8,7 +8,7 @@ from typing import Dict, Tuple, List, BinaryIO
 import numpy as np  # type: ignore
 
 from gazeclassify.core.model.dataset import Dataset, Metadata, GazeData, DataRecord, VideoMetadata
-from gazeclassify.core.serialization import Serializer
+from gazeclassify.core.model.serialization import Serializer
 from gazeclassify.utils import memory_logging
 
 

@@ -5,7 +5,8 @@ import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation, configuration  # type: ignore
 
-from gazeclassify.core.model.dataset import Dataset, Classification
+from gazeclassify.core.model.dataset import Dataset
+from gazeclassify.core.services.algorithms import Classification
 from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
 from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
 from gazeclassify.thirdparty.opencv import OpenCVFrameReader, OpenCVFrameWriter
@@ -23,7 +24,6 @@ def load_from_pupil_invisible(path: str) -> Dataset:
 
 
 def classify(dataset: Dataset, name: str) -> None:
-    classifcation = Classification(name)
     source_file = dataset.metadata.video_format.file
     frame_reader = OpenCVFrameReader(source_file)
 

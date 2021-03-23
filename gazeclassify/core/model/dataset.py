@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
+from gazeclassify.core.services.algorithms import Classification
+
 
 @dataclass
 class Metadata:
@@ -26,12 +28,6 @@ class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
     classifications: List[Classification] = field(default_factory=list)
-
-
-@dataclass
-class Classification:
-    name: str
-    result: List[int] = field(default_factory=list)
 
 
 @dataclass

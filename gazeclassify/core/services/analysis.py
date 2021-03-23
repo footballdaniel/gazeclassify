@@ -5,9 +5,9 @@ from gazeclassify.core.services.video import FrameReader, FrameWriter
 
 
 @dataclass
-class AnalysisState:
+class FrameIterator:
     reader: FrameReader
-    writer: Optional[FrameWriter]
+    writer: FrameWriter
     _current_frame: int = 0
 
 
