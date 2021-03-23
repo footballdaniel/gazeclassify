@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, BinaryIO
+from typing import Dict, BinaryIO, Union
 
 
 class EyeTrackingDataRepository(ABC):
@@ -9,5 +9,5 @@ class EyeTrackingDataRepository(ABC):
         ...
 
     @abstractmethod
-    def load_video_metadata(self) -> Dict[str, int]:
+    def load_video_metadata(self) -> Dict[str, str]:
         ...

@@ -3,11 +3,11 @@ from typing import Any
 import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
+from gazeclassify.core.model.dataset import Dataset
 from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
 from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
 
-
-def load_from_pupil_invisible(path: str) -> Any:
+def load_from_pupil_invisible(path: str) -> Dataset:
     file_repository = PupilInvisibleRepository(path)
     gaze_data = file_repository.load_gaze_data()
     video_metadata = file_repository.load_video_metadata()
@@ -17,8 +17,12 @@ def load_from_pupil_invisible(path: str) -> Any:
     return dataset
 
 
-def segment_with_pixellib() -> None:
-    a = 1
+def segment_humans(dataset: Dataset) -> None:
+
+
+
+    for record in Dataset.records:
+
     segment_image = instance_segmentation(infer_speed="average")
     segment_image.load_model("mask_rcnn_coco.h5")
     segment_image.process_video(

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, BinaryIO
+from typing import Dict, BinaryIO, Union
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
@@ -26,19 +26,23 @@ class PupilInvisibleRepository(EyeTrackingDataRepository):
         }
         return filestream_dict
 
-    def load_video_metadata(self) -> Dict[str, int]:
+    def load_video_metadata(self) -> Dict[str, str]:
         video_file = self._get_file_name(self.folder_path)
         capture = cv2.VideoCapture(video_file)
-        width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        frame_rate = int(capture.get(cv2.CAP_PROP_FPS))
-        frame_number = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        width = str(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = str(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        frame_rate = str(capture.get(cv2.CAP_PROP_FPS))
+        frame_number = str(capture.get(cv2.CAP_PROP_FRAME_COUNT))
         capture.release()
+
+        folder_path = self.folder_path
         video_metadata = {
             'width': width,
             'height': height,
             'frame rate': frame_rate,
-            'frame number': frame_number
+            'frame number': frame_number,
+            'world video file': video_file,
+            'folder path': folder_path
         }
         return video_metadata
 

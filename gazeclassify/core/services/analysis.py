@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from gazeclassify.core.services.video import FrameReader, FrameWriter
 
@@ -6,4 +7,4 @@ from gazeclassify.core.services.video import FrameReader, FrameWriter
 @dataclass
 class AnalysisState:
     reader: FrameReader
-    writer: FrameWriter
+    writer: Optional[FrameWriter]

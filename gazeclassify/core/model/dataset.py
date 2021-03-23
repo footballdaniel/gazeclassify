@@ -9,11 +9,16 @@ from typing import List
 @dataclass
 class Metadata:
     recording_name: str
-    world_video_file: Path
-    world_video_width: int
-    world_video_height: int
-    world_video_frame_number: int
-    world_video_frame_rate: int
+    video_format: VideoMetadata
+
+
+@dataclass
+class VideoMetadata:
+    file: Path
+    width: int
+    height: int
+    frame_number: int
+    frame_rate: int
 
 
 @dataclass
@@ -25,13 +30,8 @@ class Dataset(ABC):
 @dataclass
 class DataRecord:
     world_timestamp: float
-    video: VideoFrame
+    video_frame_index: int
     gaze: GazeData
-
-
-@dataclass
-class VideoFrame:
-    frame_index: int
 
 
 @dataclass
