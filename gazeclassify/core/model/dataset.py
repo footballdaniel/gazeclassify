@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
+
+from gazeclassify.core.services.analysis import AnalysisState
 
 
 @dataclass
@@ -25,6 +27,13 @@ class VideoMetadata:
 class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
+    classifications: List[Classification] = field(default_factory=list)
+
+
+@dataclass
+class Classification:
+    name: str
+    result: List[int] = field(default_factory=list)
 
 
 @dataclass

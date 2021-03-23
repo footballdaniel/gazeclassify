@@ -54,6 +54,7 @@ class TestOpenCVVideoReader:
         bytesioframe = io.BytesIO(bytesframe)
         reconvert = bytesioframe.getvalue()
 
+        # Read image with cv2
         image = cv2.imdecode(np.frombuffer(bytesframe, np.uint8), cv2.IMREAD_COLOR)
         rgb_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
@@ -85,4 +86,5 @@ class TestOpenCVVideoReader:
         writer = cv2.VideoWriter("gazeclassify/tests/data/frame_export.mp4", codec, fps, (width, height))
         writer.write(frame)
         writer.release()
+
 

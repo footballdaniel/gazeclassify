@@ -18,9 +18,7 @@ def main() -> None:
     target_classes = segment_image.select_target_classes(person=True)
 
     # Source: https://pixellib.readthedocs.io/en/latest/Image_instance.html
-    segmask, output = extract_mask_and_output(
-        segment_image, target_classes, "image.jpg"
-    )
+    segmask, output = extract_mask_and_output(segment_image, target_classes, "image.jpg")
 
     extended_segmask = dilate(segmask)
 
@@ -46,9 +44,8 @@ def instantiate_model(model_file: Path) -> instance_segmentation:
     return segment_image
 
 
-def extract_mask_and_output(
-        segment_image: instance_segmentation, targets: Dict[str, str], image_file: str
-) -> Tuple[Dict[str, np.ndarray], np.ndarray]:
+def extract_mask_and_output(segment_image: instance_segmentation, targets: Dict[str, str], image_file: str)\
+        -> Tuple[Dict[str, np.ndarray], np.ndarray]:
     segmask, output = segment_image.segmentImage(
         image_file,
         segment_target_classes=targets,

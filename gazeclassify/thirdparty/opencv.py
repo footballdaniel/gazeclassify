@@ -1,5 +1,6 @@
 import io
 from dataclasses import dataclass
+from pathlib import Path
 from typing import BinaryIO, Any, cast
 
 import cv2  # type: ignore
@@ -9,7 +10,7 @@ from gazeclassify.core.services.video import FrameReader, FrameWriter
 
 @dataclass
 class OpenCVFrameReader(FrameReader):
-    folder_path: str
+    file: Path
     _current_frame_index: int = -1
 
     @property
@@ -19,17 +20,17 @@ class OpenCVFrameReader(FrameReader):
     def release(self) -> None:
         self._capture.release()
 
-    def _get_file_name(self, path: str) -> str:
-        return path + "/world.mp4"
-
     def open_capture(self) -> None:
-        file_name = self._get_file_name(self.folder_path)
-        self._capture = cv2.VideoCapture(file_name)
+        self._capture = cv2.VideoCapture(str(self.file))
 
     def get_frame(self) -> BinaryIO:
-        has_frame, frame = self._capture.read()
+        if self._capture is None:
+            self.open_capture()
+
+        has_frame, frame = self._capture.read()  # type: ignore
         if not has_frame:
-            self._capture.release()
+            self._capture.release()  # type: ignore
+
         bytesio = self.convert_to_bytesio(frame)
         self._current_frame_index += 1
         return bytesio
@@ -42,6 +43,8 @@ class OpenCVFrameReader(FrameReader):
 
 @dataclass
 class OpenCVFrameWriter(FrameWriter):
+
+
     output_video_name: str = ""
     codec: str = 'DIVX'
     frames_per_second: int = 25
@@ -49,6 +52,10 @@ class OpenCVFrameWriter(FrameWriter):
     height: int = 100
     _current_frame_index: int = 0
     _capture: Any = None
+
+    @property
+    def file(self) -> Path:
+        pass
 
     @property
     def current_frame_index(self) -> int:

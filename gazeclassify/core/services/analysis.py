@@ -8,3 +8,8 @@ from gazeclassify.core.services.video import FrameReader, FrameWriter
 class AnalysisState:
     reader: FrameReader
     writer: Optional[FrameWriter]
+    _current_frame: int = 0
+
+
+
+
