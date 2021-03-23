@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, BinaryIO
 
-from gazeclassify.core.video import FrameSeeker
+from gazeclassify.core.services.video import FrameReader
 
 class EyeTrackingDataRepository(ABC):
 
@@ -10,7 +10,7 @@ class EyeTrackingDataRepository(ABC):
         ...
 
     @abstractmethod
-    def load_video_capture(self) -> FrameSeeker:
+    def load_video_capture(self) -> FrameReader:
         ...
 
     @abstractmethod

@@ -6,8 +6,6 @@ from typing import List
 
 import numpy as np  # type: ignore
 
-from gazeclassify.core.video import FrameSeeker
-
 
 @dataclass
 class Metadata:
@@ -22,7 +20,6 @@ class Metadata:
 class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
-    video: FrameSeeker
 
 
 @dataclass

@@ -6,9 +6,9 @@ from typing import Dict, Tuple, List, BinaryIO
 
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model import Dataset, Metadata, GazeData, DataRecord, VideoFrame
+from gazeclassify.core.model.dataset import Dataset, Metadata, GazeData, DataRecord, VideoFrame
 from gazeclassify.core.serialization import Serializer
-from gazeclassify.core.video import FrameSeeker
+from gazeclassify.core.services.video import FrameReader
 from gazeclassify.utils import memory_logging
 
 
@@ -81,7 +81,7 @@ class PupilDataSerializer(Serializer):
             self,
             inputs: Dict[str, BinaryIO],
             video_metadata: Dict[str, int],
-            video_capture: FrameSeeker) -> Dataset:
+            video_capture: FrameReader) -> Dataset:
         timestamps = TimestampsDeserializer(inputs['world timestamps'])
         timestamps.deserialize()
         world_video_timestamps = timestamps.world_timestamps
@@ -130,7 +130,7 @@ class PupilDataSerializer(Serializer):
 
         video = video_capture
 
-        dataset = Dataset(data_records, metadata, video)
+        dataset = Dataset(data_records, metadata)
 
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')
@@ -154,7 +154,7 @@ class TimestampMatcher:
             self._match_data_to_baseline_index(current_baseline_timestamp, data)
         return self.matched_timestamps
 
-    def _match_data_to_baseline_index(self, current_baseline_timestamp, data):
+    def _match_data_to_baseline_index(self, current_baseline_timestamp: float, data: List[float]) -> None:
         if self._is_data_timestamp_higher_than(current_baseline_timestamp):
             self.matched_timestamps.append(data[self._search_index])
         else:
@@ -167,7 +167,7 @@ class TimestampMatcher:
             else:
                 self.matched_timestamps.append(data[-1])
 
-    def _has_not_ended(self, data: float) -> bool:
+    def _has_not_ended(self, data: List[float]) -> bool:
         has_not_ended = self._search_index < len(data) - 1
         return has_not_ended
 

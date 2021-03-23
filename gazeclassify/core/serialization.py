@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Dict, BinaryIO
 
-from gazeclassify.core.model import Dataset
-from gazeclassify.core.video import FrameSeeker
+from gazeclassify.core.model.dataset import Dataset
+from gazeclassify.core.services.video import FrameReader
 
 
 class Serializer(ABC):
 
     @abstractmethod
-    def deserialize(self, inputs: Dict[str, BinaryIO], video_metadata: Dict[str, int], video_capture: FrameSeeker) -> Dataset:
+    def deserialize(self, inputs: Dict[str, BinaryIO], video_metadata: Dict[str, int], video_capture: FrameReader) -> Dataset:
         ...
 
     @abstractmethod
