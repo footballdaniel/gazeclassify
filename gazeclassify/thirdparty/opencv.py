@@ -13,6 +13,9 @@ class OpenCVFrameReader(FrameReader):
     file: Path
     _current_frame_index: int = -1
 
+    def open(self, file: Path) -> None:
+        self.file = file
+
     @property
     def current_frame_index(self) -> int:
         return self._current_frame_index if self._current_frame_index >= 0 else 0

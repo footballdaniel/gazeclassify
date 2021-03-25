@@ -5,6 +5,10 @@ from typing import BinaryIO
 
 class FrameReader(ABC):
 
+    @abstractmethod
+    def open(self, file: Path) -> None:
+        ...
+
     @property
     @abstractmethod
     def current_frame_index(self) -> int:
