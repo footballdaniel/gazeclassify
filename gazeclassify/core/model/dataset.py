@@ -1,21 +1,22 @@
 from __future__ import annotations
 
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Dict, Union
+from typing import List
 
 
 @dataclass
 class Metadata:
     recording_name: str
-    video_format: VideoMetadata  # Has to be Video Streams (world + eye + eye)
-    # Video stream handle
+    video_format: VideoMetadata
 
-# New class video classifiers
-# Classifications
-# target_name: str
-# gaze_target_distance float
+
+@dataclass
+class Segmentation:
+    name: str
+    gaze_distance: float
+
 
 @dataclass
 class VideoMetadata:
@@ -30,27 +31,26 @@ class VideoMetadata:
 class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
-    classifications: List[ClassificationData] = field(default_factory=list)
 
-@dataclass
-class ClassificationData:
-    classification: Dict[str, Union[List[int], List[Instance]]]
 
 @dataclass
 class Instance:
     name: str
     pixel_location: Position
 
+
 @dataclass
 class Position:
     x: int
     y: int
+
 
 @dataclass
 class DataRecord:
     world_timestamp: float
     video_frame_index: int
     gaze: GazeData
+
 
 @dataclass
 class GazeData:
