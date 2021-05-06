@@ -1,12 +1,12 @@
 import logging
 
-import tensorflow as tf
+import tensorflow as tf  # type: ignore
 from pixellib.instance import instance_segmentation, configuration  # type: ignore
-from pixellib.mask_rcnn import MaskRCNN
+from pixellib.mask_rcnn import MaskRCNN  # type: ignore
 
 from gazeclassify.thirdparty.pixellib.modeldownload import ModelDownload
 
-def main():
+def main() -> None:
     tf.get_logger().setLevel(logging.WARNING)
     model_file = ModelDownload("mask_rcnn_coco.h5").download()
     segment_video = instance_segmentation()

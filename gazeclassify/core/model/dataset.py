@@ -9,8 +9,13 @@ from typing import List, Dict, Union
 @dataclass
 class Metadata:
     recording_name: str
-    video_format: VideoMetadata
+    video_format: VideoMetadata  # Has to be Video Streams (world + eye + eye)
+    # Video stream handle
 
+# New class video classifiers
+# Classifications
+# target_name: str
+# gaze_target_distance float
 
 @dataclass
 class VideoMetadata:
