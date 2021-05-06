@@ -7,7 +7,7 @@ from typing import Dict, Tuple, List, BinaryIO
 
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model.dataset import Dataset, Metadata, GazeData, DataRecord, VideoMetadata
+from gazeclassify.core.model.dataset import Dataset, Metadata, GazeData, DataRecord, VideoData
 from gazeclassify.core.model.serialization import Serializer
 from gazeclassify.utils import memory_logging
 
@@ -118,7 +118,7 @@ class PupilDataSerializer(Serializer):
 
             data_records.append(record)
 
-        video_format = VideoMetadata(
+        world_video = VideoData(
             file=video_path,
             width=world_video_width,
             height=world_video_height,
@@ -128,10 +128,9 @@ class PupilDataSerializer(Serializer):
 
         metadata = Metadata(
             recording_name=recording_name,
-            video_format=video_format
         )
 
-        dataset = Dataset(data_records, metadata)
+        dataset = Dataset(data_records, metadata, world_video)
 
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')

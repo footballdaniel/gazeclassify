@@ -9,7 +9,6 @@ from typing import List
 @dataclass
 class Metadata:
     recording_name: str
-    video_format: VideoMetadata
 
 
 @dataclass
@@ -19,7 +18,7 @@ class Segmentation:
 
 
 @dataclass
-class VideoMetadata:
+class VideoData:
     file: Path
     width: int
     height: int
@@ -31,6 +30,7 @@ class VideoMetadata:
 class Dataset(ABC):
     records: List[DataRecord]
     metadata: Metadata
+    world_video: VideoData
 
 
 @dataclass
