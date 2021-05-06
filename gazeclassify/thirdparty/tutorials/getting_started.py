@@ -2,9 +2,11 @@ from pixellib.instance import instance_segmentation  # type: ignore
 from pixellib.semantic import semantic_segmentation  # type: ignore
 
 # What if tensorflow cant get GPU to run? Warnings include cuda, cudart or similar. Do:
-# https://ourcodeworld.com/articles/read/1433/how-to-fix-tensorflow-warning-could-not-load-dynamic-library-cudart64-110dll-dlerror-cudart64-110dll-not-found
-# BUT! make sure to download a compatible since OpenPose dont support the latest CUDA (tensorflow 2.3+ supports CUDA 11)
-# https://stackoverflow.com/a/50622526 -> https://developer.nvidia.com/cuda-10.1-download-archive-base?target_os=Windows&target_arch=x86_64&target_version=10&target_type=exelocal
+# https://ourcodeworld.com/articles/read/1433/how-to-fix-tensorflow-warning-could-not-load-dynamic-library-cudart64
+# -110dll-dlerror-cudart64-110dll-not-found BUT! make sure to download a compatible since OpenPose does not support
+# the latest CUDA (tensorflow 2.3+ supports CUDA 11) https://stackoverflow.com/a/50622526 ->
+# https://developer.nvidia.com/cuda-10.1-download-archive-base?target_os=Windows&target_arch=x86_64&target_version=10
+# &target_type=exelocal
 
 # ADDING TO PATH: https://stackoverflow.com/a/60024201
 # https://stackoverflow.com/questions/59823283/could-not-load-dynamic-library-cudart64-101-dll-on-tensorflow-cpu-only-install

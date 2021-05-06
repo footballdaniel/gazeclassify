@@ -13,28 +13,23 @@ from gazeclassify.thirdparty.pixellib.modeldownload import ModelDownload
 
 def main() -> None:
     model_file = ModelDownload("mask_rcnn_coco.h5").download()
-
     segment_image = instantiate_model(model_file)
     target_classes = segment_image.select_target_classes(person=True)
 
     # Source: https://pixellib.readthedocs.io/en/latest/Image_instance.html
     segmask, output = extract_mask_and_output(segment_image, target_classes, "image.jpg")
-
     extended_segmask = dilate(segmask)
-
     export_to_file(segmask, output, extended_segmask)
 
 
 def dilate(segmask: Dict[str, np.ndarray]) -> np.ndarray:
     black_white_mask = segmask["masks"].astype(int)[:, :, 1] * 255
     black_white_mask = np.asarray(black_white_mask, dtype="uint8")
-
     # https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html
     kernel_expansion_x = 5
     kernel_expansion_y = 5
     kernel = np.ones((kernel_expansion_x, kernel_expansion_y), np.uint8)
     dilation = cv2.dilate(black_white_mask, kernel, iterations=1)
-
     return dilation
 
 
@@ -44,7 +39,7 @@ def instantiate_model(model_file: Path) -> instance_segmentation:
     return segment_image
 
 
-def extract_mask_and_output(segment_image: instance_segmentation, targets: Dict[str, str], image_file: str)\
+def extract_mask_and_output(segment_image: instance_segmentation, targets: Dict[str, str], image_file: str) \
         -> Tuple[Dict[str, np.ndarray], np.ndarray]:
     segmask, output = segment_image.segmentImage(
         image_file,
