@@ -1,7 +1,8 @@
+import json
 import logging
 import os.path
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Dict, Any
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
@@ -35,20 +36,46 @@ class ModelLoader:
         local_file = self._data_path_in_home_directory() + 'mask_rcnn_coco.h5'
         request.urlretrieve(remote_url, local_file)
 
+
 @dataclass
 class Classification:
     name: str
     distance_from_gaze: float
 
+
 @dataclass
-class Results:
+class FrameResult:
     records: List[Classification]
+
+
+class ClassesToDictEncoder(json.JSONEncoder):
+    def default(self, obj: object) -> Dict[Any, Any]:
+        return obj.__dict__
+
+
+class JsonSerializer:
+    def encode(self, data: object, filename: str = "try.json") -> None:
+        with open(filename, "w") as write_file:
+            json.dump(
+                data,
+                write_file,
+                indent=4,
+                sort_keys=True,
+                cls=ClassesToDictEncoder
+            )
+
 
 @dataclass
 class Analysis:
     data_path: str = os.path.expanduser("~/gazeclassify_data/")
-    results: List[Results] = field(default_factory=list)
+    results: List[FrameResult] = field(default_factory=list)
     dataset: Dataset = NullDataset()
+
+
+    def save_to_json(self) -> None:
+        serializer = JsonSerializer()
+        serializer.encode(self.results, "test.json")
+
 
 @dataclass
 class PupilInvisibleLoader:
@@ -65,7 +92,7 @@ class PupilInvisibleLoader:
 class SemanticSegmentation:
     analysis: Analysis
 
-    def classify(self, name: str, ) -> None:
+    def classify(self, name: str) -> None:
 
         source_file = str(self.analysis.dataset.world_video.file)
 
@@ -82,9 +109,12 @@ class SemanticSegmentation:
         # SEND FRAME TO WRITER
         video_target = os.path.expanduser(f"~/gazeclassify_data/{name}.avi")
         result_video = cv2.VideoWriter(video_target, cv2.VideoWriter_fourcc(*'MP4V'), 10,
-                                       (self.analysis.dataset.world_video.width, self.analysis.dataset.world_video.height))
+                                       (self.analysis.dataset.world_video.width,
+                                        self.analysis.dataset.world_video.height))
 
         capture = cv2.VideoCapture(source_file)
+
+        index = 0
         for record in self.analysis.dataset.records:
 
             hasframe, frame = capture.read()
@@ -110,6 +140,8 @@ class SemanticSegmentation:
             binary_image_mask = bool_concat.astype('uint8')
             pixel_distance = PixelDistance(binary_image_mask)
             pixel_distance.detect_shape(positive_values=1)
+
+            print(f"GAZE: {record.gaze.x} + {record.gaze.y}")
             distance = pixel_distance.distance_gaze_to_shape(record.gaze.x, record.gaze.y)
 
             # Make alpha image to rgb
@@ -119,8 +151,21 @@ class SemanticSegmentation:
             # Write video out
             result_video.write(rgb_out)
 
-            break
-            # Save result to dataset results
+            # Append results
+            classification = Classification(name, distance)
+
+            try:
+                current_frame_results = self.analysis.results[index]
+                current_frame_results.records.append(classification)
+
+            except:
+                current_frame_results = FrameResult([classification])
+                self.analysis.results.append(current_frame_results)
+
+            index += 1
+
+            if index == 15:
+                break
 
         result_video.release()
         capture.release()
