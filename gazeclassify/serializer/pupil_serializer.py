@@ -133,7 +133,7 @@ class PupilDataSerializer(Serializer):
         dataset = Dataset(data_records, metadata, world_video)
 
         logger = logging.getLogger(__name__)
-        logger.setLevel('INFO')
+        logger.setLevel('DEBUG')
         memory_logging("Size of deserialized dataset", dataset, logger)
         return dataset
 
