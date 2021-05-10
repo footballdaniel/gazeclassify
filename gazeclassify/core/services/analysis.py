@@ -13,6 +13,28 @@ from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 
 
 @dataclass
+class ModelLoader:
+    data_path: str = "~/gazeclassify_data/"
+
+    def _data_path_in_home_directory(self) -> str:
+        return os.path.expanduser(self.data_path)
+
+    def download_if_not_available(self, model_file: str = "mask_rcnn_coco.h5") -> None:
+        file_path = self._data_path_in_home_directory() + model_file
+        if not os.path.exists(file_path):
+            self._download_file(model_file)
+        self.path = file_path
+
+    def _download_file(self, model_file: str) -> None:
+        print("FILE NOT EXISTING")
+        print(self.data_path + model_file)
+        from urllib import request
+        remote_url = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"
+        local_file = self._data_path_in_home_directory() + 'mask_rcnn_coco.h5'
+        request.urlretrieve(remote_url, local_file)
+
+
+@dataclass
 class Analysis:
     data_path: str = os.path.expanduser("~/gazeclassify_data/")
 
@@ -23,16 +45,17 @@ class Analysis:
         serializer = PupilDataSerializer()
         self._dataset = serializer.deserialize(gaze_data, video_metadata)
 
-
     def classify(self, name: str) -> None:
-        source_file = self._dataset.world_video.file
+        source_file = str(self._dataset.world_video.file)
 
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')
 
+        model = ModelLoader("~/gazeclassify_data/")
+        model.download_if_not_available("mask_rcnn_coco.h5")
+
         segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
-        model_path = os.path.expanduser("~/gazeclassify_data/mask_rcnn_coco.h5")
-        segment_image.load_model(model_path)
+        segment_image.load_model(model.path)
         target_classes = segment_image.select_target_classes(person=True)
 
         # SEND FRAME TO WRITER
@@ -40,7 +63,7 @@ class Analysis:
         result_video = cv2.VideoWriter(video_target, cv2.VideoWriter_fourcc(*'MP4V'), 10,
                                        (self._dataset.world_video.width, self._dataset.world_video.height))
 
-        capture = cv2.VideoCapture(str(source_file))
+        capture = cv2.VideoCapture(source_file)
         for record in self._dataset.records:
 
             hasframe, frame = capture.read()

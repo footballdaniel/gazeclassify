@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
@@ -27,7 +26,7 @@ class VideoData:
 
 
 @dataclass
-class Dataset(ABC):
+class Dataset:
     records: List[DataRecord]
     metadata: Metadata
     world_video: VideoData
