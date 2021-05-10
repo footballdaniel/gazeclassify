@@ -75,7 +75,7 @@ class GazeDeserializer:
             self._line_count += 1
 
 
-class PupilDataSerializer(Serializer):
+class PupilInvisibleSerializer(Serializer):
 
     def deserialize(self, gaze_data: Dict[str, BinaryIO], video_metadata: Dict[str, str]) -> Dataset:
         timestamps = TimestampsDeserializer(gaze_data['world timestamps'])

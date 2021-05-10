@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
@@ -45,6 +45,12 @@ class Position:
 
 
 @dataclass
+class GazeData:
+    x: float
+    y: float
+
+
+@dataclass
 class DataRecord:
     world_timestamp: float
     video_frame_index: int
@@ -52,6 +58,14 @@ class DataRecord:
 
 
 @dataclass
-class GazeData:
-    x: float
-    y: float
+class NullRecord(DataRecord):
+    world_timestamp: float = 0.
+    video_frame_index: int = 0
+    gaze: GazeData = GazeData(0., 0.)
+
+
+@dataclass
+class NullDataset(Dataset):
+    records: List[DataRecord] = field(default_factory=list)
+    metadata: Metadata = Metadata("")
+    world_video: VideoData = VideoData(Path(""), 0, 0, 0, 0)

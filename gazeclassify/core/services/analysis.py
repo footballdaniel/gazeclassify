@@ -1,14 +1,16 @@
 import logging
 import os.path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
+from gazeclassify.core.model.dataset import NullDataset, Dataset
 from gazeclassify.core.services.gaze_distance import PixelDistance
 from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
-from gazeclassify.serializer.pupil_serializer import PupilDataSerializer
+from gazeclassify.serializer.pupil_serializer import PupilInvisibleSerializer
 from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 
 
@@ -33,20 +35,39 @@ class ModelLoader:
         local_file = self._data_path_in_home_directory() + 'mask_rcnn_coco.h5'
         request.urlretrieve(remote_url, local_file)
 
+@dataclass
+class Classification:
+    name: str
+    distance_from_gaze: float
+
+@dataclass
+class Results:
+    records: List[Classification]
 
 @dataclass
 class Analysis:
     data_path: str = os.path.expanduser("~/gazeclassify_data/")
+    results: List[Results] = field(default_factory=list)
+    dataset: Dataset = NullDataset()
 
-    def load_from_pupil_invisible(self, path: str) -> None:
+@dataclass
+class PupilInvisibleLoader:
+    analysis: Analysis
+
+    def from_trial_folder(self, path: str) -> None:
         file_repository = PupilInvisibleRepository(path)
         gaze_data = file_repository.load_gaze_data()
         video_metadata = file_repository.load_video_metadata()
-        serializer = PupilDataSerializer()
-        self._dataset = serializer.deserialize(gaze_data, video_metadata)
+        serializer = PupilInvisibleSerializer()
+        self.analysis.dataset = serializer.deserialize(gaze_data, video_metadata)
 
-    def classify(self, name: str) -> None:
-        source_file = str(self._dataset.world_video.file)
+@dataclass
+class SemanticSegmentation:
+    analysis: Analysis
+
+    def classify(self, name: str, ) -> None:
+
+        source_file = str(self.analysis.dataset.world_video.file)
 
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')
@@ -61,10 +82,10 @@ class Analysis:
         # SEND FRAME TO WRITER
         video_target = os.path.expanduser(f"~/gazeclassify_data/{name}.avi")
         result_video = cv2.VideoWriter(video_target, cv2.VideoWriter_fourcc(*'MP4V'), 10,
-                                       (self._dataset.world_video.width, self._dataset.world_video.height))
+                                       (self.analysis.dataset.world_video.width, self.analysis.dataset.world_video.height))
 
         capture = cv2.VideoCapture(source_file)
-        for record in self._dataset.records:
+        for record in self.analysis.dataset.records:
 
             hasframe, frame = capture.read()
 
