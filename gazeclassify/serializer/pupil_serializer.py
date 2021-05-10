@@ -90,6 +90,7 @@ class PupilInvisibleSerializer(Serializer):
 
         matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
         gaze_x = matcher.match_to_base_frame_rate(gaze_x_raw)
+        matcher = TimestampMatcher(world_video_timestamps, gaze_timestamps_raw)
         gaze_y = matcher.match_to_base_frame_rate(gaze_y_raw)
 
         world_video_width = int(float(video_metadata['width']))

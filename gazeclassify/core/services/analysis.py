@@ -2,10 +2,11 @@ import json
 import logging
 import os.path
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
+from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.core.model.dataset import NullDataset, Dataset
@@ -37,17 +38,6 @@ class ModelLoader:
         request.urlretrieve(remote_url, local_file)
 
 
-@dataclass
-class Classification:
-    name: str
-    distance_from_gaze: float
-
-
-@dataclass
-class FrameResult:
-    records: List[Classification]
-
-
 class ClassesToDictEncoder(json.JSONEncoder):
     def default(self, obj: object) -> Dict[Any, Any]:
         return obj.__dict__
@@ -66,11 +56,16 @@ class JsonSerializer:
 
 
 @dataclass
+class Classification:
+    name: str
+    distances: List[Optional[float]]
+
+
+@dataclass
 class Analysis:
     data_path: str = os.path.expanduser("~/gazeclassify_data/")
-    results: List[FrameResult] = field(default_factory=list)
+    results: List[Classification] = field(default_factory=list)
     dataset: Dataset = NullDataset()
-
 
     def save_to_json(self) -> None:
         serializer = JsonSerializer()
@@ -87,6 +82,7 @@ class PupilInvisibleLoader:
         video_metadata = file_repository.load_video_metadata()
         serializer = PupilInvisibleSerializer()
         self.analysis.dataset = serializer.deserialize(gaze_data, video_metadata)
+
 
 @dataclass
 class SemanticSegmentation:
@@ -108,13 +104,14 @@ class SemanticSegmentation:
 
         # SEND FRAME TO WRITER
         video_target = os.path.expanduser(f"~/gazeclassify_data/{name}.avi")
-        result_video = cv2.VideoWriter(video_target, cv2.VideoWriter_fourcc(*'MP4V'), 10,
+        fourcc = cv2.VideoWriter_fourcc(*"avc1")
+        result_video = cv2.VideoWriter(video_target, fourcc, 10,
                                        (self.analysis.dataset.world_video.width,
                                         self.analysis.dataset.world_video.height))
 
         capture = cv2.VideoCapture(source_file)
 
-        index = 0
+        distances: List[Optional[float]] = []
         for record in self.analysis.dataset.records:
 
             hasframe, frame = capture.read()
@@ -123,9 +120,6 @@ class SemanticSegmentation:
                 print("Ran out of frames")
 
             segmask, output = segment_image.segmentFrame(frame, segment_target_classes=target_classes)
-
-            # img_converted = Image.fromarray(output)
-            # img_converted.show()
 
             # Only get the masks for all areas of type person
             people_masks = []
@@ -141,8 +135,13 @@ class SemanticSegmentation:
             pixel_distance = PixelDistance(binary_image_mask)
             pixel_distance.detect_shape(positive_values=1)
 
-            print(f"GAZE: {record.gaze.x} + {record.gaze.y}")
-            distance = pixel_distance.distance_gaze_to_shape(record.gaze.x, record.gaze.y)
+            image_width = self.analysis.dataset.world_video.width
+            image_height = self.analysis.dataset.world_video.height
+
+            pixel_x = record.gaze.x * image_width
+            pixel_y = image_height - (record.gaze.y * image_height) # flip vertically
+            print(f"GAZE: {pixel_x} + {pixel_y}")
+            distance = pixel_distance.distance_gaze_to_shape(pixel_x, pixel_y)
 
             # Make alpha image to rgb
             int_concat = bool_concat.astype('uint8') * 255
@@ -152,20 +151,19 @@ class SemanticSegmentation:
             result_video.write(rgb_out)
 
             # Append results
-            classification = Classification(name, distance)
+            distances.append(distance)
 
-            try:
-                current_frame_results = self.analysis.results[index]
-                current_frame_results.records.append(classification)
+            # Visualize gaze overlay plot
+            img_converted = Image.fromarray(output)
+            import matplotlib.pyplot as plt  # type: ignore
+            plt.imshow(img_converted)
+            plt.scatter(pixel_x, pixel_y)
+            # img_converted.show()
+            # plt.show()
 
-            except:
-                current_frame_results = FrameResult([classification])
-                self.analysis.results.append(current_frame_results)
 
-            index += 1
-
-            if index == 15:
-                break
+        classification = Classification(name, distances)
+        self.analysis.results.append(classification)
 
         result_video.release()
         capture.release()
