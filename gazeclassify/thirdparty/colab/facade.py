@@ -30,8 +30,8 @@ def classify(dataset: Dataset, name: str) -> None:
     target_classes = segment_image.select_target_classes(person=True)
 
     # SEND FRAME TO WRITER
-    video_target = os.path.expanduser(f"~/gazecalssify_data/{name}.avi")
-    result_video = cv2.VideoWriter("person.avi", cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 10,
+    video_target = os.path.expanduser(f"~/gazeclassify_data/{name}.avi")
+    result_video = cv2.VideoWriter(video_target, cv2.VideoWriter_fourcc(*'MP4V'), 10,
                                    (dataset.world_video.width, dataset.world_video.height))
 
     capture = cv2.VideoCapture(str(source_file))
@@ -58,29 +58,22 @@ def classify(dataset: Dataset, name: str) -> None:
         bool_concat = np.any(segmask["masks"], axis=-1)
         int_concat = bool_concat.astype(int) * 255
 
-        # Extend to 3d rgb image
-        # b = np.repeat(int_concat[:, :, np.newaxis], 3, axis=2)
-        # Image.fromarray(b.astype(np.uint8)).show()
+        # Get distance to mask
+        detected_shape = np.argwhere(int_concat == 255)
+        # Get gaze and calculate distance from mask
+        gaze = [record.gaze.x, record.gaze.y]
+        dist_2 = np.sqrt(np.sum((detected_shape - gaze) ** 2, axis=1))
+        distance = np.min(dist_2)
 
-        # bytesframe = cv2.imencode('.jpg', int_concat)[1].tobytes()
-        #
-        # # Append to writer
-        # bytesframe = cv2.imencode('.jpg', int_concat)[1]
-        #
-        # image = Image.fromarray(b.astype(np.uint8))
+        # Make alpha image to rgb
+        rgb_out = np.dstack([int_concat]*3)
+        rgb_uint_out = rgb_out.astype('uint8')
 
-        lower_int = int_concat.astype('uint8')
-
-        a = 1
-
-        rgb_out = np.dstack([lower_int]*3)
-
-        result_video.write(rgb_out)
+        # Write video out
+        result_video.write(rgb_uint_out)
 
 
         break
-        # QUERY GAZE: is on image?
-
         # Save result to dataset results
 
     result_video.release()
