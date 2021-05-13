@@ -3,6 +3,7 @@ import logging
 import os.path
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
+from urllib import request
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
@@ -18,6 +19,7 @@ from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 
 @dataclass
 class ModelLoader:
+    model_url: str = ""
     data_path: str = "~/gazeclassify_data/"
 
     def _data_path_in_home_directory(self) -> str:
@@ -30,11 +32,8 @@ class ModelLoader:
         self.path = file_path
 
     def _download_file(self, model_file: str) -> None:
-        print("FILE NOT EXISTING")
-        print(self.data_path + model_file)
-        from urllib import request
-        remote_url = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"
-        local_file = self._data_path_in_home_directory() + 'mask_rcnn_coco.h5'
+        remote_url = self.model_url
+        local_file = self._data_path_in_home_directory() + model_file
         request.urlretrieve(remote_url, local_file)
 
 
@@ -95,7 +94,8 @@ class SemanticSegmentation:
         logger = logging.getLogger(__name__)
         logger.setLevel('INFO')
 
-        model = ModelLoader("~/gazeclassify_data/")
+        model = ModelLoader("https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5",
+                            "~/gazeclassify_data/")
         model.download_if_not_available("mask_rcnn_coco.h5")
 
         segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
@@ -139,7 +139,7 @@ class SemanticSegmentation:
             image_height = self.analysis.dataset.world_video.height
 
             pixel_x = record.gaze.x * image_width
-            pixel_y = image_height - (record.gaze.y * image_height) # flip vertically
+            pixel_y = image_height - (record.gaze.y * image_height)  # flip vertically
             print(f"GAZE: {pixel_x} + {pixel_y}")
             distance = pixel_distance.distance_gaze_to_shape(pixel_x, pixel_y)
 
@@ -161,10 +161,21 @@ class SemanticSegmentation:
             # img_converted.show()
             # plt.show()
 
-
         classification = Classification(name, distances)
         self.analysis.results.append(classification)
 
         result_video.release()
         capture.release()
         cv2.destroyAllWindows()
+
+
+@dataclass
+class InstanceSegmentation:
+    analysis: Analysis
+
+    def classify(self, name: str) -> None:
+        # https://cv-tricks.com/pose-estimation/using-deep-learning-in-opencv/
+        OPENPOSE_URL = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose_iter_160000.caffemodel"
+
+        # https://github.com/faizancodes/NBA-Pose-Estimation-Analysis
+        # Basketball
