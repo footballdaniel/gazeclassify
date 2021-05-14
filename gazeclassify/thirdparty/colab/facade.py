@@ -7,7 +7,7 @@ from gazeclassify.core.services.instance_classifier import InstanceSegmentation
 analysis = Analysis()
 PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/tests/data")
 
-SemanticSegmentation(analysis).classify("person")
 InstanceSegmentation(analysis).classify("Head")
+SemanticSegmentation(analysis).classify("person")
 
 analysis.save_to_json()
