@@ -4,7 +4,7 @@ from typing import Optional, Tuple, List
 
 import cv2  # type: ignore
 
-from gazeclassify.core.services.analysis import ModelLoader
+from gazeclassify.core.services.model_loader import ModelLoader
 
 # Sources
 # https://github.com/faizancodes/NBA-Pose-Estimation-Analysis

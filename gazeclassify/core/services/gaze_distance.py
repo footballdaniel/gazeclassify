@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import cast, Union, Optional
+from typing import cast, Optional
 
 import numpy as np  # type: ignore
 

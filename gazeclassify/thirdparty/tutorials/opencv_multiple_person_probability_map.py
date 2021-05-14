@@ -5,7 +5,7 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
 
-from gazeclassify.core.services.analysis import ModelLoader
+from gazeclassify.core.services.model_loader import ModelLoader
 
 ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
             "~/gazeclassify_data/").download_if_not_available("pose_iter_160000.caffemodel")

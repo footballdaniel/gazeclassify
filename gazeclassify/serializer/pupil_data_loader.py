@@ -8,6 +8,10 @@ from typing import Any, List, BinaryIO
 import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
 
+from gazeclassify.core.services.analysis import Analysis
+from gazeclassify.serializer.pupil_repository import PupilInvisibleRepository
+from gazeclassify.serializer.pupil_serializer import PupilInvisibleSerializer
+
 
 @dataclass
 class PupilDataLoader:
@@ -158,3 +162,15 @@ class PupilDataLoader:
         folder = Path(path)
         full_filename = Path.joinpath(folder, "gaze_positions.csv")
         return full_filename
+
+
+@dataclass
+class PupilInvisibleLoader:
+    analysis: Analysis
+
+    def from_trial_folder(self, path: str) -> None:
+        file_repository = PupilInvisibleRepository(path)
+        gaze_data = file_repository.load_gaze_data()
+        video_metadata = file_repository.load_video_metadata()
+        serializer = PupilInvisibleSerializer()
+        self.analysis.dataset = serializer.deserialize(gaze_data, video_metadata)
