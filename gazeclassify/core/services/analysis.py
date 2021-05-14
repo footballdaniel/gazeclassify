@@ -8,13 +8,13 @@ from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.core.model.dataset import NullDataset, Dataset
-from gazeclassify.core.services.results import Classification, JsonSerializer
+from gazeclassify.core.services.results import Classification, JsonSerializer, FrameResults
 
 
 @dataclass
 class Analysis:
     data_path: str = os.path.expanduser("~/gazeclassify_data/")
-    results: List[Classification] = field(default_factory=list)
+    results: List[FrameResults] = field(default_factory=list)
     dataset: Dataset = NullDataset()
 
     def save_to_json(self) -> None:

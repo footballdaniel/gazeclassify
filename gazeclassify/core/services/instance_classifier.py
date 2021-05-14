@@ -1,6 +1,6 @@
 # https://learnopencv.com/multi-person-pose-estimation-in-opencv-using-openpose/
 # https://github.com/spmallick/learnopencv/blob/master/OpenPose-Multi-Person/multi-person-openpose.py
-
+import logging
 import os
 from dataclasses import dataclass
 
@@ -8,7 +8,9 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 
 from gazeclassify.core.services.analysis import Analysis
+from gazeclassify.core.services.gaze_distance import DistanceToPoint
 from gazeclassify.core.services.model_loader import ModelLoader
+from gazeclassify.core.services.results import Classification, InstanceClassification, FrameResults
 
 
 @dataclass
@@ -16,18 +18,108 @@ class InstanceSegmentation:
     analysis: Analysis
 
     def classify(self, name: str) -> None:
-        # https://cv-tricks.com/pose-estimation/using-deep-learning-in-opencv/
-        OPENPOSE_URL = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose_iter_160000.caffemodel"
 
-        # https://github.com/faizancodes/NBA-Pose-Estimation-Analysis
-        # Basketball
-        #
+        logger = logging.getLogger(__name__)
+        logger.setLevel('INFO')
 
-        ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
-                    "~/gazeclassify_data/").download_if_not_available("pose_iter_160000.caffemodel")
+        ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel",
+                    "~/gazeclassify_data/").download_if_not_available("pose_iter_440000.caffemodel")
+
+        # SEND FRAME TO WRITER
+        video_target = os.path.expanduser("~/gazeclassify_data/") + f"{name}.mp4"
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        result_video = cv2.VideoWriter(video_target, fourcc, 10,
+                                       (self.analysis.dataset.world_video.width,
+                                        self.analysis.dataset.world_video.height))
+
+        source_file = str(self.analysis.dataset.world_video.file)
+        capture = cv2.VideoCapture(source_file)
+
+        idx = 0
+
+        for record in self.analysis.dataset.records:
+
+            hasframe, frame = capture.read()
+
+            if not hasframe:
+                print("Ran out of frames")
+
+            frameClone, personwiseKeypoints, keypoints_list = self.classify_frame(frame)
+
+            # Write video out
+            result_video.write(frameClone)
+
+            # Getting the keypoints per person
+            POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
+                          [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
+                          [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
+                          [2, 17], [5, 16]]
+            for i in range(17):
+                for n in range(len(personwiseKeypoints)):
+                    index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
+                    if -1 in index:
+                        continue
+                    B = np.int32(keypoints_list[index.astype(int), 0])
+                    A = np.int32(keypoints_list[index.astype(int), 1])
+
+                    first_point = (B[0], A[0])
+                    second_point = (B[1], A[1])
+
+            # MY STUFF: I Manually append the points
+            # Getting the keypoints per person
+            POSE_PAIRS = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6],
+                          [7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12],
+                          [13, 13], [14, 14], [15, 15], [16, 16], [17, 17],
+                          [18, 18]]
+
+            ## Append to results
+            keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow', 'Left Wrist', 'Right Hip', 'Right Knee',
+                                'Right Ankle', 'Left Hip', 'Left Knee', 'Left Ankle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear']
+
+            results = []
+            for i in range(17):
+                for n in range(len(personwiseKeypoints)):
+                    index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
+                    if -1 in index:
+                        continue
+                    B = np.int32(keypoints_list[index.astype(int), 0])
+                    A = np.int32(keypoints_list[index.astype(int), 1])
+
+                    point_x = B[0]
+                    point_y = A[0]
+
+                    distance = DistanceToPoint(point_x, point_y).distance_2d(record.gaze.x, record.gaze.y)
+                    results.append(InstanceClassification(distance, keypointsMapping[i], n))
+
+                    # if i == 14:
+                    #     cv2.circle(frameClone,(point_x, point_y),10,[0, 100, 255])
+                    #     cv2.imshow("image", frameClone)
+                    #     cv2.waitKey(0)
+
+            frame_results = FrameResults(idx, name, results)
+            self.analysis.results.append(frame_results)
+
+            idx += 1
+
+            if idx == 2:
+                print("DEBUG STOP")
+                break
+
+
+
+        result_video.release()
+        capture.release()
+        cv2.destroyAllWindows()
+
+
+    def classify_frame(self, frame):
+        image1 = frame
+
+        # image1 = cv2.imread("gazeclassify/tests/data/humans.jpeg")
+
+
         protoFile = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
         weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
-        image1 = cv2.imread("gazeclassify/tests/data/humans.jpeg")
 
         nPoints = 18
         # COCO Output Format
@@ -92,10 +184,11 @@ class InstanceSegmentation:
             detected_keypoints.append(keypoints_with_id)
 
         frameClone = image1.copy()
-        for i in range(nPoints):
-            for j in range(len(detected_keypoints[i])):
-                cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
-        cv2.imshow("Keypoints", frameClone)
+        # Print keypoints
+        # for i in range(nPoints):
+        #     for j in range(len(detected_keypoints[i])):
+        #         cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
+        # cv2.imshow("Keypoints", frameClone)
 
         valid_pairs, invalid_pairs = self.getValidPairs(output, mapIdx, frameWidth, frameHeight, detected_keypoints, POSE_PAIRS)
         personwiseKeypoints = self.getPersonwiseKeypoints(valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS, keypoints_list)
@@ -109,8 +202,11 @@ class InstanceSegmentation:
                 A = np.int32(keypoints_list[index.astype(int), 1])
                 cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
 
-        cv2.imshow("Detected Pose", frameClone)
-        cv2.waitKey(0)
+        # Print detected pose
+        # cv2.imshow("Detected Pose", frameClone)
+        # cv2.waitKey(0)
+
+        return frameClone, personwiseKeypoints, keypoints_list
 
     def getKeypoints(self, probMap, threshold=0.1):
         mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
@@ -179,7 +275,8 @@ class InstanceSegmentation:
                         paf_interp = []
                         for k in range(len(interp_coord)):
                             paf_interp.append([pafA[int(round(interp_coord[k][1])), int(round(interp_coord[k][0]))],
-                                               pafB[int(round(interp_coord[k][1])), int(round(interp_coord[k][0]))]])
+                                               pafB[
+                                                   int(round(interp_coord[k][1])), int(round(interp_coord[k][0]))]])
                         # Find E
                         paf_scores = np.dot(paf_interp, d_ij)
                         avg_paf_score = sum(paf_scores) / len(paf_scores)
@@ -203,6 +300,8 @@ class InstanceSegmentation:
                 valid_pairs.append([])
         return valid_pairs, invalid_pairs
 
+    # This function creates a list of keypoints belonging to each person
+    # For each detected valid pair, it assigns the joint(s) to a person
     def getPersonwiseKeypoints(self, valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS, keypoints_list):
         # the last number in each row is the overall score
         personwiseKeypoints = -1 * np.ones((0, 19))
