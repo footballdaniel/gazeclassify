@@ -60,6 +60,7 @@ python -m build # Build will be placed in /dist folder
 
 ### Upload package to PyPI server
 - Create another user account on [pypi.org](https://pypi.org/)
+- Use `python -m build` to build the package
 - Use `twine upload dist/*` to send the package to the server
 
 ### Save token in Home/.pypirc
