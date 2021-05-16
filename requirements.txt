@@ -1,10 +1,8 @@
-tensorflow==2.4.1
+tensorflow==2.5.0
 pixellib~=0.6.1
 ffmpeg-python==0.2.0
-# pytest-mock==3.5.1
-# pytest==6.5.2
 setuptools~=44.0.0
 numpy~=1.19.5
 opencv-python~=4.5.1.48
 Pillow~=8.1.0
-pytest~=6.2.2
+pytest~=6.2.4
