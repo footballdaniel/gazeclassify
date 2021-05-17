@@ -1,0 +1,3 @@
+gaze_timestamp,world_index,confidence,norm_pos_x,norm_pos_y,base_data,gaze_point_3d_x,gaze_point_3d_y,gaze_point_3d_z,eye_center0_3d_x,eye_center0_3d_y,eye_center0_3d_z,gaze_normal0_x,gaze_normal0_y,gaze_normal0_z,eye_center1_3d_x,eye_center1_3d_y,eye_center1_3d_z,gaze_normal1_x,gaze_normal1_y,gaze_normal1_z
+65.305218199,1910,1,0.566112013424144,0.540593097828053,,,,,,,,,,,,,,,,
+65.321254199,1911,1,0.567168740665211,0.544625345865885,,,,,,,,,,,,,,,,

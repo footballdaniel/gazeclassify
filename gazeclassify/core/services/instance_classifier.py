@@ -10,36 +10,50 @@ import numpy as np  # type: ignore
 from gazeclassify.core.services.analysis import Analysis
 from gazeclassify.core.services.gaze_distance import DistanceToPoint
 from gazeclassify.core.services.model_loader import ModelLoader
-from gazeclassify.core.services.results import Classification, InstanceClassification, FrameResults
+from gazeclassify.core.services.results import InstanceClassification, FrameResults
 
+@dataclass
+class VideoWriter:
+    target_file: str
+
+    def initiate(self, video_width: int, video_height: int):
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        self.result_video = cv2.VideoWriter(self.target_file, fourcc, 10, (video_width, video_height))
+
+    def write(self, frame) -> None:
+        self.result_video.write(frame)
+
+    def release(self) -> None:
+        self.result_video.release()
+
+@dataclass
+class VideoReader:
+    target_file: str
+
+    def initiate(self) -> None:
+        self.capture = cv2.VideoCapture(self.target_file)
+
+    def next_frame(self):
+        hasframe, frame = self.capture.read()
+        return hasframe, frame
 
 @dataclass
 class InstanceSegmentation:
     analysis: Analysis
+    model_url: str = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel"
 
     def classify(self, name: str) -> None:
 
-        logger = logging.getLogger(__name__)
-        logger.setLevel('INFO')
+        ModelLoader(self.model_url,"~/gazeclassify_data/").download_if_not_available("pose_iter_440000.caffemodel")
 
-        ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel",
-                    "~/gazeclassify_data/").download_if_not_available("pose_iter_440000.caffemodel")
-
-        # SEND FRAME TO WRITER
-        video_target = os.path.expanduser("~/gazeclassify_data/") + f"{name}.mp4"
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        result_video = cv2.VideoWriter(video_target, fourcc, 10,
-                                       (self.analysis.dataset.world_video.width,
-                                        self.analysis.dataset.world_video.height))
-
-        source_file = str(self.analysis.dataset.world_video.file)
-        capture = cv2.VideoCapture(source_file)
+        writer = self._setup_video_writer(name)
+        reader = self._setup_video_reader()
 
         idx = 0
 
         for record in self.analysis.dataset.records:
 
-            hasframe, frame = capture.read()
+            hasframe, frame = reader.next_frame()
 
             if not hasframe:
                 print("Ran out of frames")
@@ -47,7 +61,7 @@ class InstanceSegmentation:
             frameClone, personwiseKeypoints, keypoints_list = self.classify_frame(frame)
 
             # Write video out
-            result_video.write(frameClone)
+            writer.write(frameClone)
 
             # Getting the keypoints per person
             POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
@@ -105,12 +119,24 @@ class InstanceSegmentation:
                 print("DEBUG STOP")
                 break
 
-
-
-        result_video.release()
-        capture.release()
+        writer.release()
+        reader.capture.release()
         cv2.destroyAllWindows()
 
+    def _setup_video_reader(self):
+        source_file = str(self.analysis.dataset.world_video.file)
+        reader = VideoReader(source_file)
+        reader.initiate()
+
+        return reader
+
+    def _setup_video_writer(self, name):
+        video_target = os.path.expanduser("~/gazeclassify_data/") + f"{name}.mp4"
+        logging.info(f"Writing export video to: {video_target}")
+        world_video = self.analysis.dataset.world_video
+        writer = VideoWriter(video_target)
+        writer.initiate(world_video.width, world_video.height)
+        return writer
 
     def classify_frame(self, frame):
         image1 = frame

@@ -10,6 +10,7 @@ from pixellib.instance import instance_segmentation  # type: ignore
 from gazeclassify.core.model.dataset import NullDataset, Dataset
 from gazeclassify.core.services.results import Classification, JsonSerializer, FrameResults
 
+import logging
 
 @dataclass
 class Analysis:
@@ -23,3 +24,9 @@ class Analysis:
 
     def clear_data(self) -> None:
         raise NotImplementedError
+
+    def set_logger(self, str) -> None:
+        logging.basicConfig(level=str, format='%(levelname)s: %(message)s')
+        logger = logging.getLogger(__name__)
+        logger.setLevel(str)
+
