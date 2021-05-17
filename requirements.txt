@@ -1,8 +1,7 @@
 tensorflow==2.5.0
-pixellib~=0.6.1
-ffmpeg-python==0.2.0
-setuptools~=44.0.0
-numpy~=1.19.5
-opencv-python~=4.5.1.48
-Pillow~=8.1.0
-pytest~=6.2.4
+pixellib==0.6.1
+ffmpeg-python>=0.2.0
+numpy>=1.19.5
+opencv-python>=4.5.1.48
+Pillow>=8.1.0
+pytest>=6.2.4

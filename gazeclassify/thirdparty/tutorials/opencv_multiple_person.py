@@ -12,7 +12,7 @@ ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_
             "~/gazeclassify_data/").download_if_not_available("pose_iter_160000.caffemodel")
 protoFile = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
 weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
-image1 = cv2.imread("../../tests/data/humans.jpeg")
+image1 = cv2.imread("../../example_data/humans.jpeg")
 
 nPoints = 18
 # COCO Output Format

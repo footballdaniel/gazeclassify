@@ -115,7 +115,7 @@ class InstanceSegmentation:
     def classify_frame(self, frame):
         image1 = frame
 
-        # image1 = cv2.imread("gazeclassify/tests/data/humans.jpeg")
+        # image1 = cv2.imread("gazeclassify/tests/example_data/humans.jpeg")
 
 
         protoFile = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"

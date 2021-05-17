@@ -19,7 +19,7 @@ def main() -> None:
     # Hack the rcnn to accept my config. it overrides part of the load_model() function
     segment_video.model = MaskRCNN(mode="inference", model_dir=segment_video.model_dir, config=coco_config)
 
-    segment_video.process_video("gazeclassify/tests/data/world.mp4", frames_per_second=20, output_video_name="out.mp4")
+    segment_video.process_video("gazeclassify/tests/example_data/world.mp4", frames_per_second=20, output_video_name="out.mp4")
 
     a = 1
 

@@ -13,7 +13,7 @@ def main() -> None:
     tf.get_logger().setLevel(logging.WARNING)
     model_file = ModelDownload("mask_rcnn_coco.h5").download()
     t = time.time()
-    segment_video(model_file, "gazeclassify/tests/data/world.mp4")
+    segment_video(model_file, "gazeclassify/tests/example_data/world.mp4")
     print(time.time() - t)
     t = time.time()
     segment_image_ten_times(model_file, "image.jpg")

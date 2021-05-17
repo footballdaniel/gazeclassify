@@ -23,7 +23,7 @@ weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_160000.caf
 net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
 
 # Read image
-frame = cv2.imread("../../tests/data/frame.jpg", cv2.IMREAD_UNCHANGED)
+frame = cv2.imread("../../example_data/frame.jpg", cv2.IMREAD_UNCHANGED)
 
 # Resize image to analyze
 frame = cv2.resize(frame, (600, 600))

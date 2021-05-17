@@ -18,7 +18,7 @@ class VideoHandle:
 
 class TestOpenCVVideoReader:
     def test_read_two_video_frames_opencv_results_in_two_frames(self) -> None:
-        capture = cv2.VideoCapture("gazeclassify/tests/data/two_frames.mp4")
+        capture = cv2.VideoCapture("gazeclassify/example_data/two_frames.mp4")
         frame_counter = -1
         while True:
             has_frame, frame = capture.read()
@@ -28,7 +28,7 @@ class TestOpenCVVideoReader:
         assert frame_counter == 2
 
     def test_read_videoframe_to_bytes_and_back_to_image(self) -> None:
-        capture = cv2.VideoCapture("gazeclassify/tests/data/frame.mp4")
+        capture = cv2.VideoCapture("gazeclassify/example_data/frame.mp4")
 
         _, frame = capture.read()
 
@@ -43,7 +43,7 @@ class TestOpenCVVideoReader:
         assert frame.shape == rgb_image.shape
 
     def test_read_videoframe_to_bytes_to_bytesIO_back_to_bytes_and_back_to_image(self) -> None:
-        capture = cv2.VideoCapture("gazeclassify/tests/data/frame.mp4")
+        capture = cv2.VideoCapture("gazeclassify/example_data/frame.mp4")
 
         has_frames, frame = capture.read()
 
@@ -62,7 +62,7 @@ class TestOpenCVVideoReader:
         assert frame.shape == rgb_image.shape
 
     def test_get_video_width_and_height_and_fps(self) -> None:
-        capture = cv2.VideoCapture("gazeclassify/tests/data/frame.mp4")
+        capture = cv2.VideoCapture("gazeclassify/example_data/frame.mp4")
         width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = int(capture.get(cv2.CAP_PROP_FPS))
@@ -75,7 +75,7 @@ class TestOpenCVVideoReader:
         assert frame_nr == 1
 
     def test_write_video(self) -> None:
-        capture = cv2.VideoCapture("gazeclassify/tests/data/frame.mp4")
+        capture = cv2.VideoCapture("gazeclassify/example_data/frame.mp4")
         width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = int(capture.get(cv2.CAP_PROP_FPS))
@@ -83,7 +83,7 @@ class TestOpenCVVideoReader:
         capture.release()
 
         codec = cv2.VideoWriter_fourcc(*'DIVX')
-        writer = cv2.VideoWriter("gazeclassify/tests/data/frame_export.mp4", codec, fps, (width, height))
+        writer = cv2.VideoWriter("gazeclassify/example_data/frame_export.mp4", codec, fps, (width, height))
         writer.write(frame)
         writer.release()
 

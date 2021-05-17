@@ -16,7 +16,7 @@ nPoints = 18
 POSE_PAIRS = [[1, 0], [1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12],
               [12, 13], [0, 14], [0, 15], [14, 16], [15, 17]]
 
-frame = cv2.imread("../../tests/data/humans.jpeg")
+frame = cv2.imread("../../example_data/humans.jpeg")
 frameCopy = np.copy(frame)
 frameWidth = frame.shape[1]
 frameHeight = frame.shape[0]
