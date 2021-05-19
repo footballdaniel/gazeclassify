@@ -74,10 +74,7 @@ class InstanceSegmentation:
             writer.write(frameClone)
 
             # Getting the keypoints per person
-            POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
-                          [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
-                          [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
-                          [2, 17], [5, 16]]
+            POSE_PAIRS = self._get_pose_pairs()
             for i in range(17):
                 for n in range(len(personwiseKeypoints)):
                     index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
@@ -135,6 +132,13 @@ class InstanceSegmentation:
         reader.capture.release()
         cv2.destroyAllWindows()
 
+    def _get_pose_pairs(self):
+        POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
+                      [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
+                      [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
+                      [2, 17], [5, 16]]
+        return POSE_PAIRS
+
     def _setup_video_reader(self):
         source_file = str(self.analysis.dataset.world_video.file)
         reader = VideoReader(source_file)
@@ -150,66 +154,64 @@ class InstanceSegmentation:
         writer.initiate(world_video.width, world_video.height)
         return writer
 
-    def classify_frame(self, frame):
-        image1 = frame
+    def classify_frame(self, frame, threshold: float = 0.1):
 
-        # image1 = cv2.imread("gazeclassify/tests/example_data/humans.jpeg")
+        self._proto_file = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
+        self._weights_file = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
 
-        protoFile = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
-        weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
 
-        nPoints = 18
-        # COCO Output Format
-        keypointsMapping = ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee',
-                            'R-Ank',
-                            'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
+        mapIdx = self._get_mapping_part_affinity_fields()
 
-        POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
-                      [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
-                      [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
-                      [2, 17], [5, 16]]
+        classified_image, frame_height, frame_width = self.classify_with_dnn(frame)
 
-        # index of pafs correspoding to the POSE_PAIRS
-        # e.g for POSE_PAIR(1,2), the PAFs are located at indices (31,32) of output, Similarly, (1,5) -> (39,40) and so on.
-        mapIdx = [[31, 32], [39, 40], [33, 34], [35, 36], [41, 42], [43, 44],
-                  [19, 20], [21, 22], [23, 24], [25, 26], [27, 28], [29, 30],
-                  [47, 48], [49, 50], [53, 54], [51, 52], [55, 56],
-                  [37, 38], [45, 46]]
+        detected_keypoints, keypoints_list = self.detect_keypoints(frame, classified_image, threshold)
 
-        colors = [[0, 100, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255],
-                  [0, 255, 0], [255, 200, 100], [255, 0, 255], [0, 255, 0], [255, 200, 100], [255, 0, 255],
-                  [0, 0, 255], [255, 0, 0], [200, 200, 0], [255, 0, 0], [200, 200, 0], [0, 0, 0]]
+        valid_pairs, invalid_pairs = self.getValidPairs(classified_image, frame_width, frame_height, detected_keypoints)
+        personwiseKeypoints = self.getPersonwiseKeypoints(valid_pairs, invalid_pairs,
+                                                          keypoints_list)
 
-        frameWidth = image1.shape[1]
-        frameHeight = image1.shape[0]
+        POSE_PAIRS = self._get_pose_pairs()
+        colors = self._get_colors()
+        for i in range(17):
+            for n in range(len(personwiseKeypoints)):
+                index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
+                if -1 in index:
+                    continue
+                B = np.int32(keypoints_list[index.astype(int), 0])
+                A = np.int32(keypoints_list[index.astype(int), 1])
+                cv2.line(frame, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
 
-        net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
+
+        return frame, personwiseKeypoints, keypoints_list
+
+    def classify_with_dnn(self, frame):
+        net = cv2.dnn.readNetFromCaffe(self._proto_file, self._weights_file)
         # if args.device == "cpu":
-        net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
-        print("Using CPU device")
+        # net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
+        # print("Using CPU device")
         # elif args.device == "gpu":
-        #     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-        #     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-        #     print("Using GPU device")
+        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
-        # Fix the input Height and get the width according to the Aspect Ratio
+        frame_width = frame.shape[1]
+        frame_height = frame.shape[0]
         inHeight = 368
-        inWidth = int((inHeight / frameHeight) * frameWidth)
-
-        inpBlob = cv2.dnn.blobFromImage(image1, 1.0 / 255, (inWidth, inHeight),
-                                        (0, 0, 0), swapRB=False, crop=False)
-
+        inWidth = int((inHeight / frame_height) * frame_width)
+        inpBlob = cv2.dnn.blobFromImage(frame, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
         net.setInput(inpBlob)
-        output = net.forward()
+        classified_image = net.forward()
+        return classified_image, frame_height, frame_width
+
+    def detect_keypoints(self, frame, output, threshold):
+        nPoints = 18
+        keypointsMapping = self._get_keypoints_mapping()
 
         detected_keypoints = []
         keypoints_list = np.zeros((0, 3))
         keypoint_id = 0
-        threshold = 0.1
-
         for part in range(nPoints):
             probMap = output[0, part, :, :]
-            probMap = cv2.resize(probMap, (image1.shape[1], image1.shape[0]))
+            probMap = cv2.resize(probMap, (frame.shape[1], frame.shape[0]))
             keypoints = self.getKeypoints(probMap, threshold)
             print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
             keypoints_with_id = []
@@ -219,33 +221,26 @@ class InstanceSegmentation:
                 keypoint_id += 1
 
             detected_keypoints.append(keypoints_with_id)
+        return detected_keypoints, keypoints_list
 
-        frameClone = image1.copy()
-        # Print keypoints
-        # for i in range(nPoints):
-        #     for j in range(len(detected_keypoints[i])):
-        #         cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
-        # cv2.imshow("Keypoints", frameClone)
+    def _get_colors(self):
+        colors = [[0, 100, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255],
+                  [0, 255, 0], [255, 200, 100], [255, 0, 255], [0, 255, 0], [255, 200, 100], [255, 0, 255],
+                  [0, 0, 255], [255, 0, 0], [200, 200, 0], [255, 0, 0], [200, 200, 0], [0, 0, 0]]
+        return colors
 
-        valid_pairs, invalid_pairs = self.getValidPairs(output, mapIdx, frameWidth, frameHeight, detected_keypoints,
-                                                        POSE_PAIRS)
-        personwiseKeypoints = self.getPersonwiseKeypoints(valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS,
-                                                          keypoints_list)
+    def _get_mapping_part_affinity_fields(self):
+        mapIdx = [[31, 32], [39, 40], [33, 34], [35, 36], [41, 42], [43, 44],
+                  [19, 20], [21, 22], [23, 24], [25, 26], [27, 28], [29, 30],
+                  [47, 48], [49, 50], [53, 54], [51, 52], [55, 56],
+                  [37, 38], [45, 46]]
+        return mapIdx
 
-        for i in range(17):
-            for n in range(len(personwiseKeypoints)):
-                index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
-                if -1 in index:
-                    continue
-                B = np.int32(keypoints_list[index.astype(int), 0])
-                A = np.int32(keypoints_list[index.astype(int), 1])
-                cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
-
-        # Print detected pose
-        # cv2.imshow("Detected Pose", frameClone)
-        # cv2.waitKey(0)
-
-        return frameClone, personwiseKeypoints, keypoints_list
+    def _get_keypoints_mapping(self):
+        keypointsMapping = ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee',
+                            'R-Ank',
+                            'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
+        return keypointsMapping
 
     def getKeypoints(self, probMap, threshold=0.1):
         mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
@@ -267,7 +262,10 @@ class InstanceSegmentation:
         return keypoints
 
     # Find valid connections between the different joints of a all persons present
-    def getValidPairs(self, output, mapIdx, frameWidth, frameHeight, detected_keypoints, POSE_PAIRS):
+    def getValidPairs(self, output, frameWidth, frameHeight, detected_keypoints):
+
+        POSE_PAIRS = self._get_pose_pairs()
+        mapIdx = self._get_mapping_part_affinity_fields()
         valid_pairs = []
         invalid_pairs = []
         n_interp_samples = 10
@@ -341,7 +339,10 @@ class InstanceSegmentation:
 
     # This function creates a list of keypoints belonging to each person
     # For each detected valid pair, it assigns the joint(s) to a person
-    def getPersonwiseKeypoints(self, valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS, keypoints_list):
+    def getPersonwiseKeypoints(self, valid_pairs, invalid_pairs, keypoints_list):
+        POSE_PAIRS = self._get_pose_pairs()
+        mapIdx = self._get_mapping_part_affinity_fields()
+
         # the last number in each row is the overall score
         personwiseKeypoints = -1 * np.ones((0, 19))
 

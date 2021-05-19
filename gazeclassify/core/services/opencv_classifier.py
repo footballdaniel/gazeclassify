@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
+import cv2
 import numpy as np
 
 from gazeclassify.core.services.model_loader import ModelLoader
@@ -11,7 +12,7 @@ class OpenCVClassifier:
     model_url: str = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel"
     proto_file_url: str = "https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/openpose_pose_coco.prototxt"
 
-    def get_keypoints_mapping(self) -> List[str]:
+    def _get_keypoints_mapping(self) -> List[str]:
         mapping = ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee', 'R-Ank',
                    'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
         return mapping
@@ -45,14 +46,8 @@ class OpenCVClassifier:
         proto_model = ModelLoader(self.proto_file_url, "~/gazeclassify_data/models")
         proto_model.download_if_not_available("pose_deploy_linevec.prototxt")
 
-        self._weights_file = weights_model.file_path
+        self.weights_file = weights_model.file_path
         self._proto_file = proto_model.file_path
 
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
-
-
-
-
-
-
         return frame
