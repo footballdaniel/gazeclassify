@@ -30,7 +30,7 @@ class SemanticSegmentation:
         model.download_if_not_available("mask_rcnn_coco.h5")
 
         segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
-        segment_image.load_model(model.path)
+        segment_image.load_model(model.file_path)
         target_classes = segment_image.select_target_classes(person=True)
 
         # SEND FRAME TO WRITER

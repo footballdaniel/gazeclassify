@@ -3,60 +3,70 @@
 import logging
 import os
 from dataclasses import dataclass
+from typing import Union
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 
 from gazeclassify.core.services.analysis import Analysis
 from gazeclassify.core.services.gaze_distance import DistanceToPoint
-from gazeclassify.core.services.model_loader import ModelLoader
+from gazeclassify.core.services.opencv_classifier import OpenCVClassifier
 from gazeclassify.core.services.results import InstanceClassification, FrameResults
+
 
 @dataclass
 class VideoWriter:
     target_file: str
 
-    def initiate(self, video_width: int, video_height: int):
+    def initiate(self, video_width: int, video_height: int) -> None:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         self.result_video = cv2.VideoWriter(self.target_file, fourcc, 10, (video_width, video_height))
 
-    def write(self, frame) -> None:
+    def write(self, frame: np.ndarray) -> None:
         self.result_video.write(frame)
 
     def release(self) -> None:
         self.result_video.release()
 
+
 @dataclass
 class VideoReader:
     target_file: str
 
+    @property
+    def has_frame(self) -> Union[bool, np.ndarray]:
+        return self._has_frame
+
     def initiate(self) -> None:
         self.capture = cv2.VideoCapture(self.target_file)
 
-    def next_frame(self):
-        hasframe, frame = self.capture.read()
-        return hasframe, frame
+    def next_frame(self) -> np.ndarray:
+        self._has_frame, frame = self.capture.read()
+        return frame
+
 
 @dataclass
 class InstanceSegmentation:
     analysis: Analysis
     model_url: str = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel"
+    proto_file_url: str = "https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/openpose_pose_coco.prototxt"
+
 
     def classify(self, name: str) -> None:
-
-        ModelLoader(self.model_url,"~/gazeclassify_data/").download_if_not_available("pose_iter_440000.caffemodel")
 
         writer = self._setup_video_writer(name)
         reader = self._setup_video_reader()
 
-        idx = 0
+        for idx, record in enumerate(self.analysis.dataset.records):
 
-        for record in self.analysis.dataset.records:
+            frame = reader.next_frame()
 
-            hasframe, frame = reader.next_frame()
+            if not reader.has_frame:
+                logging.error("Video has ended prematurely")
 
-            if not hasframe:
-                print("Ran out of frames")
+            classifier = OpenCVClassifier(model_url=self.model_url, proto_file_url=self.proto_file_url)
+            classifier.download_model()
+            classifier.classify_frame(frame)
 
             frameClone, personwiseKeypoints, keypoints_list = self.classify_frame(frame)
 
@@ -87,8 +97,10 @@ class InstanceSegmentation:
                           [18, 18]]
 
             ## Append to results
-            keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow', 'Left Wrist', 'Right Hip', 'Right Knee',
-                                'Right Ankle', 'Left Hip', 'Left Knee', 'Left Ankle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear']
+            keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow',
+                                'Left Wrist', 'Right Hip', 'Right Knee',
+                                'Right Ankle', 'Left Hip', 'Left Knee', 'Left Ankle', 'Right Eye', 'Left Eye',
+                                'Right Ear', 'Left Ear']
 
             results = []
             for i in range(17):
@@ -142,7 +154,6 @@ class InstanceSegmentation:
         image1 = frame
 
         # image1 = cv2.imread("gazeclassify/tests/example_data/humans.jpeg")
-
 
         protoFile = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
         weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
@@ -216,8 +227,10 @@ class InstanceSegmentation:
         #         cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
         # cv2.imshow("Keypoints", frameClone)
 
-        valid_pairs, invalid_pairs = self.getValidPairs(output, mapIdx, frameWidth, frameHeight, detected_keypoints, POSE_PAIRS)
-        personwiseKeypoints = self.getPersonwiseKeypoints(valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS, keypoints_list)
+        valid_pairs, invalid_pairs = self.getValidPairs(output, mapIdx, frameWidth, frameHeight, detected_keypoints,
+                                                        POSE_PAIRS)
+        personwiseKeypoints = self.getPersonwiseKeypoints(valid_pairs, invalid_pairs, mapIdx, POSE_PAIRS,
+                                                          keypoints_list)
 
         for i in range(17):
             for n in range(len(personwiseKeypoints)):
