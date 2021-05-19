@@ -61,20 +61,15 @@ class InstanceSegmentation:
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
 
+            logging.info(f"Instance segmentation at frame: {idx}")
             classifier = OpenCVClassifier(model_url=self.model_url, proto_file_url=self.proto_file_url)
             classifier.download_model()
             frameClone = classifier.classify_frame(frame)
             results = classifier.gaze_distance_to_instance(record)
             frame_results = FrameResult(idx, name, results)
             self.analysis.add_result(frame_results)
-
             writer.write(frameClone)
-
             idx += 1
-
-            if idx == 2:
-                print("DEBUG STOP")
-                break
 
         writer.release()
         reader.capture.release()
