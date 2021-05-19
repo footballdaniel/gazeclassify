@@ -10,7 +10,7 @@ from pixellib.instance import instance_segmentation  # type: ignore
 from gazeclassify.core.services.analysis import Analysis
 from gazeclassify.core.services.gaze_distance import DistanceToShape
 from gazeclassify.core.services.model_loader import ModelLoader
-from gazeclassify.core.services.results import Classification, FrameResults
+from gazeclassify.core.services.results import Classification, FrameResult
 from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 
 
@@ -92,7 +92,7 @@ class SemanticSegmentation:
             idx += 1
 
             classification = Classification(distance)
-            frame_result = FrameResults(index, name, [classification])
+            frame_result = FrameResult(index, name, [classification])
             self.analysis.results.append(frame_result)
 
             if idx == 2:

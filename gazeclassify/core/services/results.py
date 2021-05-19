@@ -15,7 +15,7 @@ class InstanceClassification(Classification):
 
 
 @dataclass
-class FrameResults:
+class FrameResult:
     frame_id: int
     name: str
     classifications: List[Classification] = field(default_factory=list)
