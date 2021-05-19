@@ -1,20 +1,20 @@
 import os
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, cast, Tuple
 
-import cv2
-import numpy as np
+import cv2  # type: ignore
+import numpy as np  # type: ignore
 
+from gazeclassify.core.model.dataset import DataRecord
 from gazeclassify.core.services.gaze_distance import DistanceToPoint
 from gazeclassify.core.services.model_loader import ModelLoader
-from gazeclassify.core.services.results import InstanceClassification
+from gazeclassify.core.services.results import InstanceClassification, Classification
 
 
 @dataclass
 class OpenCVClassifier:
     model_url: str = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel"
     proto_file_url: str = "https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/openpose_pose_coco.prototxt"
-
 
     def download_model(self) -> None:
         weights_model = ModelLoader(self.model_url, "~/gazeclassify_data/")
@@ -26,7 +26,7 @@ class OpenCVClassifier:
         self.weights_file = weights_model.file_path
         self._proto_file = proto_model.file_path
 
-    def extract_results(self, record):
+    def gaze_distance_to_instance(self, record: DataRecord) -> List[Classification]:
         POSE_PAIRS = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6],
                       [7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12],
                       [13, 13], [14, 14], [15, 15], [16, 16], [17, 17],
@@ -45,28 +45,11 @@ class OpenCVClassifier:
                 point_y = A[0]
 
                 distance = DistanceToPoint(point_x, point_y).distance_2d(record.gaze.x, record.gaze.y)
-                results.append(InstanceClassification(distance, keypointsMapping[i], n))
+                classification = InstanceClassification(distance, keypointsMapping[i], n)
+                results.append(classification)
+        return results  # type: ignore
 
-
-        return results
-
-    def _get_keypoints_mapping(self):
-        keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow',
-                            'Left Wrist', 'Right Hip', 'Right Knee',
-                            'Right Ankle', 'Left Hip', 'Left Knee', 'Left Ankle', 'Right Eye', 'Left Eye',
-                            'Right Ear', 'Left Ear']
-        return keypointsMapping
-
-    def _get_pose_pairs(self):
-        POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
-                      [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
-                      [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
-                      [2, 17], [5, 16]]
-        return POSE_PAIRS
-
-
-    def classify_frame(self, frame, threshold: float = 0.1):
-
+    def classify_frame(self, frame: np.ndarray, threshold: float = 0.1) -> np.ndarray:
         self._proto_file = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
         self._weights_file = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
 
@@ -74,17 +57,29 @@ class OpenCVClassifier:
         self._frame_height = frame.shape[0]
 
         classified_image = self._classify_with_dnn(frame)
-
-        detected_keypoints= self._detect_keypoints(frame, classified_image, threshold)
-
-        valid_pairs, invalid_pairs = self._get_valid_keypoint_pairs(classified_image, detected_keypoints)
-        self._get_personwise_keypoints(valid_pairs, invalid_pairs)
+        self._detect_keypoints(classified_image, threshold)
+        self._get_valid_keypoint_pairs(classified_image)
+        self._get_personwise_keypoints()
 
         visualized_frame = self._visualize(frame)
 
         return visualized_frame
 
-    def _visualize(self, frame):
+    def _get_keypoints_mapping(self) -> List[str]:
+        keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow',
+                            'Left Wrist', 'Right Hip', 'Right Knee',
+                            'Right Ankle', 'Left Hip', 'Left Knee', 'Left Ankle', 'Right Eye', 'Left Eye',
+                            'Right Ear', 'Left Ear']
+        return keypointsMapping
+
+    def _get_pose_pairs(self) -> List[List[int]]:
+        POSE_PAIRS = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7],
+                      [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13],
+                      [1, 0], [0, 14], [14, 16], [0, 15], [15, 17],
+                      [2, 17], [5, 16]]
+        return POSE_PAIRS
+
+    def _visualize(self, frame: np.ndarray) -> np.ndarray:
         POSE_PAIRS = self._get_pose_pairs()
         colors = self._get_colors()
         for i in range(17):
@@ -97,7 +92,7 @@ class OpenCVClassifier:
                 cv2.line(frame, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
         return frame
 
-    def _classify_with_dnn(self, frame):
+    def _classify_with_dnn(self, frame: np.ndarray) -> np.ndarray:
         net = cv2.dnn.readNetFromCaffe(self._proto_file, self._weights_file)
         net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
@@ -109,7 +104,7 @@ class OpenCVClassifier:
         classified_image = net.forward()
         return classified_image
 
-    def _detect_keypoints(self, frame, output, threshold):
+    def _detect_keypoints(self, classified_image: np.ndarray, threshold: float) -> None:
         nPoints = 18
         keypointsMapping = self._get_keypoints_mapping_raw()
 
@@ -117,8 +112,8 @@ class OpenCVClassifier:
         keypoints_list = np.zeros((0, 3))
         keypoint_id = 0
         for part in range(nPoints):
-            probMap = output[0, part, :, :]
-            probMap = cv2.resize(probMap, (frame.shape[1], frame.shape[0]))
+            probMap = classified_image[0, part, :, :]
+            probMap = cv2.resize(probMap, (self._frame_width, self._frame_height))
             keypoints = self._get_keypoints(probMap, threshold)
             print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
             keypoints_with_id = []
@@ -126,31 +121,30 @@ class OpenCVClassifier:
                 keypoints_with_id.append(keypoints[i] + (keypoint_id,))
                 keypoints_list = np.vstack([keypoints_list, keypoints[i]])
                 keypoint_id += 1
-
             detected_keypoints.append(keypoints_with_id)
         self.keypoints_list = keypoints_list
-        return detected_keypoints, keypoints_list
+        self.detected_keypoints = detected_keypoints
 
-    def _get_colors(self):
+    def _get_colors(self) -> List[List[int]]:
         colors = [[0, 100, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255], [0, 255, 255], [0, 100, 255],
                   [0, 255, 0], [255, 200, 100], [255, 0, 255], [0, 255, 0], [255, 200, 100], [255, 0, 255],
                   [0, 0, 255], [255, 0, 0], [200, 200, 0], [255, 0, 0], [200, 200, 0], [0, 0, 0]]
         return colors
 
-    def _get_mapping_part_affinity_fields(self):
+    def _get_mapping_part_affinity_fields(self) -> List[List[int]]:
         mapIdx = [[31, 32], [39, 40], [33, 34], [35, 36], [41, 42], [43, 44],
                   [19, 20], [21, 22], [23, 24], [25, 26], [27, 28], [29, 30],
                   [47, 48], [49, 50], [53, 54], [51, 52], [55, 56],
                   [37, 38], [45, 46]]
         return mapIdx
 
-    def _get_keypoints_mapping_raw(self):
+    def _get_keypoints_mapping_raw(self) -> List[str]:
         keypointsMapping = ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee',
                             'R-Ank',
                             'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
         return keypointsMapping
 
-    def _get_keypoints(self, probMap, threshold=0.1):
+    def _get_keypoints(self, probMap: np.ndarray, threshold: float =0.1) -> List[Tuple[int]]:
         mapSmooth = cv2.GaussianBlur(probMap, (3, 3), 0, 0)
 
         mask = np.uint8(mapSmooth > threshold)
@@ -167,9 +161,7 @@ class OpenCVClassifier:
 
         return keypoints
 
-    def _get_valid_keypoint_pairs(self, classified_image, detected_keypoints):
-        # Find valid connections between the different joints of a all persons present
-
+    def _get_valid_keypoint_pairs(self, classified_image: np.ndarray) -> None:
         POSE_PAIRS = self._get_pose_pairs()
         mapIdx = self._get_mapping_part_affinity_fields()
         valid_pairs = []
@@ -186,8 +178,8 @@ class OpenCVClassifier:
             pafB = cv2.resize(pafB, (self._frame_width, self._frame_height))
 
             # Find the keypoints for the first and second limb
-            candidate_a = detected_keypoints[POSE_PAIRS[k][0]]
-            candidate_b = detected_keypoints[POSE_PAIRS[k][1]]
+            candidate_a = self.detected_keypoints[POSE_PAIRS[k][0]]
+            candidate_b = self.detected_keypoints[POSE_PAIRS[k][1]]
             nA = len(candidate_a)
             nB = len(candidate_b)
 
@@ -224,11 +216,11 @@ class OpenCVClassifier:
                         if (len(np.where(paf_scores > paf_score_th)[0]) / n_interp_samples) > conf_th:
                             if avg_paf_score > maxScore:
                                 max_j = j
-                                maxScore = avg_paf_score
+                                maxScore = avg_paf_score # type: ignore
                                 found = 1
                     # Append the connection to the list
                     if found:
-                        valid_pair = np.append(valid_pair, [[candidate_a[i][3], candidate_b[max_j][3], maxScore]],
+                        valid_pair = np.append(valid_pair, [[candidate_a[i][3], candidate_b[max_j][3], maxScore]],  # type: ignore
                                                axis=0)
 
                 # Append the detected connections to the global list
@@ -237,9 +229,10 @@ class OpenCVClassifier:
                 print("No Connection : k = {}".format(k))
                 invalid_pairs.append(k)
                 valid_pairs.append([])
-        return valid_pairs, invalid_pairs
+        self.valid_pairs = valid_pairs
+        self.invalid_pairs = invalid_pairs
 
-    def _get_personwise_keypoints(self, valid_pairs, invalid_pairs):
+    def _get_personwise_keypoints(self) -> None:
         # This function creates a list of keypoints belonging to each person
         # For each detected valid pair, it assigns the joint(s) to a person
         POSE_PAIRS = self._get_pose_pairs()
@@ -249,12 +242,12 @@ class OpenCVClassifier:
         personwiseKeypoints = -1 * np.ones((0, 19))
 
         for k in range(len(mapIdx)):
-            if k not in invalid_pairs:
-                partAs = valid_pairs[k][:, 0]
-                partBs = valid_pairs[k][:, 1]
+            if k not in self.invalid_pairs:
+                partAs = self.valid_pairs[k][:, 0]
+                partBs = self.valid_pairs[k][:, 1]
                 indexA, indexB = np.array(POSE_PAIRS[k])
 
-                for i in range(len(valid_pairs[k])):
+                for i in range(len(self.valid_pairs[k])):
                     found = 0
                     person_idx = -1
                     for j in range(len(personwiseKeypoints)):
@@ -266,14 +259,14 @@ class OpenCVClassifier:
                     if found:
                         personwiseKeypoints[person_idx][indexB] = partBs[i]
                         personwiseKeypoints[person_idx][-1] += self.keypoints_list[partBs[i].astype(int), 2] + \
-                                                               valid_pairs[k][i][2]
+                                                               self.valid_pairs[k][i][2]
 
                     elif not found and k < 17:
                         row = -1 * np.ones(19)
                         row[indexA] = partAs[i]
                         row[indexB] = partBs[i]
                         # add the keypoint_scores for the two keypoints and the paf_score
-                        row[-1] = sum(self.keypoints_list[valid_pairs[k][i, :2].astype(int), 2]) + valid_pairs[k][i][2]
+                        row[-1] = sum(self.keypoints_list[self.valid_pairs[k][i, :2].astype(int), 2]) + self.valid_pairs[k][i][2]
                         personwiseKeypoints = np.vstack([personwiseKeypoints, row])
 
         self.personwise_keypoints = personwiseKeypoints

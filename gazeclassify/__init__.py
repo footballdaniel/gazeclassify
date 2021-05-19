@@ -6,7 +6,7 @@ tf.get_logger().setLevel('ERROR')
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # Disable user warnings (necessary for keras)
-def warn(*args, **kwargs):
+def warn(*args, **kwargs) -> None:  # type: ignore
     pass
 import warnings
 warnings.warn = warn

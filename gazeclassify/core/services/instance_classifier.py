@@ -51,10 +51,8 @@ class InstanceSegmentation:
     proto_file_url: str = "https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/openpose_pose_coco.prototxt"
 
     def classify(self, name: str) -> None:
-
         writer = self._setup_video_writer(name)
         reader = self._setup_video_reader()
-
 
         for idx, record in enumerate(self.analysis.dataset.records):
 
@@ -65,13 +63,12 @@ class InstanceSegmentation:
 
             classifier = OpenCVClassifier(model_url=self.model_url, proto_file_url=self.proto_file_url)
             classifier.download_model()
-            classified_image = classifier.classify_frame(frame)
-            results = classifier.extract_results(record)
-
-            writer.write(classified_image)
-
+            frameClone = classifier.classify_frame(frame)
+            results = classifier.gaze_distance_to_instance(record)
             frame_results = FrameResult(idx, name, results)
             self.analysis.add_result(frame_results)
+
+            writer.write(frameClone)
 
             idx += 1
 
@@ -83,18 +80,16 @@ class InstanceSegmentation:
         reader.capture.release()
         cv2.destroyAllWindows()
 
-    def _setup_video_reader(self):
+    def _setup_video_reader(self) -> VideoReader:
         source_file = str(self.analysis.dataset.world_video.file)
         reader = VideoReader(source_file)
         reader.initiate()
-
         return reader
 
-    def _setup_video_writer(self, name):
+    def _setup_video_writer(self, name: str) -> VideoWriter:
         video_target = os.path.expanduser("~/gazeclassify_data/") + f"{name}.mp4"
         logging.info(f"Writing export video to: {video_target}")
         world_video = self.analysis.dataset.world_video
         writer = VideoWriter(video_target)
         writer.initiate(world_video.width, world_video.height)
         return writer
-

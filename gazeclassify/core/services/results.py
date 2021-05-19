@@ -5,7 +5,7 @@ from typing import List, Optional, Dict, Any
 
 @dataclass
 class Classification:
-    distance: float
+    distance: Optional[float]
 
 
 @dataclass
