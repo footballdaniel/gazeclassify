@@ -1,30 +1,31 @@
 import os
-from dataclasses import dataclass, field
-from typing import List, cast, Tuple
+from dataclasses import dataclass
+from typing import List, Tuple
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model.dataset import DataRecord
-from gazeclassify.core.services.gaze_distance import DistanceToPoint
-from gazeclassify.core.services.model_loader import ModelLoader
-from gazeclassify.core.services.results import InstanceClassification, Classification
+from gazeclassify.domain.dataset import DataRecord
+from gazeclassify.services.gaze_distance import DistanceToPoint
+from gazeclassify.services.model_loader import ClassifierLoader
+from gazeclassify.services.results import InstanceClassification, Classification
+
 
 
 @dataclass
 class OpenCVClassifier:
-    model_url: str = "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/coco/pose_iter_440000.caffemodel"
+    model_url: str = "https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-caffe-models/raw/master/caffe_models/openpose/caffe_model/pose_iter_440000.caffemodel"
     proto_file_url: str = "https://raw.githubusercontent.com/opencv/opencv_extra/master/testdata/dnn/openpose_pose_coco.prototxt"
 
     def download_model(self) -> None:
-        weights_model = ModelLoader(self.model_url, "~/gazeclassify_data/")
-        weights_model.download_if_not_available("pose_iter_440000.caffemodel")
+        weights_model = ClassifierLoader(self.model_url, "gazeclassify_data/models")
+        weights_model.download_if_not_available()
 
-        proto_model = ModelLoader(self.proto_file_url, "~/gazeclassify_data/models")
-        proto_model.download_if_not_available("pose_deploy_linevec.prototxt")
+        proto_model = ClassifierLoader(self.proto_file_url, "gazeclassify_data/models")
+        proto_model.download_if_not_available()
 
-        self.weights_file = weights_model.file_path
-        self._proto_file = proto_model.file_path
+        self._weights_file = str(weights_model.file_path)
+        self._proto_file = str(proto_model.file_path)
 
     def gaze_distance_to_instance(self, record: DataRecord) -> List[Classification]:
         POSE_PAIRS = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6],
@@ -50,9 +51,6 @@ class OpenCVClassifier:
         return results  # type: ignore
 
     def classify_frame(self, frame: np.ndarray, threshold: float = 0.1) -> np.ndarray:
-        self._proto_file = os.path.expanduser("~/gazeclassify_data/") + "pose_deploy_linevec.prototxt"
-        self._weights_file = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_440000.caffemodel"
-
         self._frame_width = frame.shape[1]
         self._frame_height = frame.shape[0]
 

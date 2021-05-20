@@ -5,9 +5,6 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
 
-from gazeclassify.utils import performance_logging
-
-
 @dataclass
 class VideoHandle:
     stream: cv2.VideoCapture

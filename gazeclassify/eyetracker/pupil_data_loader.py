@@ -9,9 +9,9 @@ import cv2  # type: ignore
 import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model.repository import EyeTrackingDataRepository
-from gazeclassify.core.services.analysis import Analysis
-from gazeclassify.serializer.pupil_serializer import PupilInvisibleSerializer
+from gazeclassify.domain.repository import EyeTrackingDataRepository
+from gazeclassify.services.analysis import Analysis
+from gazeclassify.eyetracker.pupil_serializer import PupilInvisibleSerializer
 
 
 @dataclass

@@ -7,9 +7,9 @@ from typing import Dict, Tuple, List, BinaryIO
 
 import numpy as np  # type: ignore
 
-from gazeclassify.core.model.dataset import Dataset, Metadata, GazeData, DataRecord, VideoData
-from gazeclassify.core.model.serialization import Serializer
-from gazeclassify.core.services.timestamp_matcher import TimestampMatcher
+from gazeclassify.domain.dataset import Dataset, Metadata, GazeData, DataRecord, VideoData
+from gazeclassify.domain.serialization import Serializer
+from gazeclassify.services.timestamp_matcher import TimestampMatcher
 from gazeclassify.utils import memory_logging
 
 
@@ -133,13 +133,7 @@ class PupilInvisibleSerializer(Serializer):
         )
 
         dataset = Dataset(data_records, metadata, world_video)
-
-        logger = logging.getLogger(__name__)
-        logger.setLevel('DEBUG')
-        memory_logging("Size of deserialized dataset", dataset, logger)
         return dataset
 
     def serialize(self) -> Tuple[str, str]:
         raise NotImplementedError
-
-

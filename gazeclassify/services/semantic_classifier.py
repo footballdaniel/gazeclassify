@@ -1,55 +1,68 @@
 import logging
 import os.path
 from dataclasses import dataclass
+from pathlib import Path
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
-from gazeclassify.core.services.analysis import Analysis
-from gazeclassify.core.services.gaze_distance import DistanceToShape
-from gazeclassify.core.services.model_loader import ModelLoader
-from gazeclassify.core.services.results import Classification, FrameResult
+from gazeclassify.domain.video import VideoWriter, VideoReader
+from gazeclassify.services.analysis import Analysis
+from gazeclassify.services.gaze_distance import DistanceToShape
+from gazeclassify.services.model_loader import ClassifierLoader
+from gazeclassify.services.results import Classification, FrameResult
+from gazeclassify.thirdparty.opencv import OpenCVReader, OpenCVWriter
 from gazeclassify.thirdparty.pixellib.helpers import InferSpeed
 
 
 @dataclass
 class SemanticSegmentation:
     analysis: Analysis
+    video_filepath: Path = Path.home().joinpath("gazeclassify_data/videos")
+    model_url: str = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"
 
-    def classify(self, name: str) -> None:
+    def _setup_video_reader(self, file: Path) -> VideoReader:
+        reader = OpenCVReader(file)
+        reader.initiate()
+        return reader
 
-        source_file = str(self.analysis.dataset.world_video.file)
+    def _setup_video_writer(self, classifier_name: str) -> VideoWriter:
+        Path.mkdir(self.video_filepath, parents=True, exist_ok=True)
+        video_target = f"gazeclassify_data/videos/{classifier_name}.mp4"
+        video_path = Path.home().joinpath(video_target)
+        writer = OpenCVWriter(video_path)
+        world_video = self.analysis.dataset.world_video
+        writer.initiate(world_video.width, world_video.height)
+        return writer
 
-        logger = logging.getLogger(__name__)
-        logger.setLevel('INFO')
+    def classify(self, classifier_name: str) -> None:
+        writer = self._setup_video_writer(classifier_name)
+        reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
 
-        model = ModelLoader("https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5",
-                            "~/gazeclassify_data/")
-        model.download_if_not_available("mask_rcnn_coco.h5")
+        model = self.download_model()
 
         segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
         segment_image.load_model(model.file_path)
         target_classes = segment_image.select_target_classes(person=True)
 
-        # SEND FRAME TO WRITER
-        video_target = os.path.expanduser("~/gazeclassify_data/") + f"{name}.mp4"
+        video_target = os.path.expanduser("~/gazeclassify_data/") + f"{classifier_name}.mp4"
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         result_video = cv2.VideoWriter(video_target, fourcc, 10,
                                        (self.analysis.dataset.world_video.width,
                                         self.analysis.dataset.world_video.height))
 
-        capture = cv2.VideoCapture(source_file)
+        for idx, record in enumerate(self.analysis.dataset.records):
 
-        idx = 0
-        for record in self.analysis.dataset.records:
+            logging.info(f"Instance segmentation at frame: {idx}")
+            frame = reader.next_frame()
 
-            hasframe, frame = capture.read()
+            if not reader.has_frame:
+                logging.error("Video has ended prematurely")
+                break
 
-            if not hasframe:
-                print("Ran out of frames")
-
+            classifier = PixellibTensorflowClassifier(self.model_url)
             segmask, output = segment_image.segmentFrame(frame, segment_target_classes=target_classes)
 
             # Only get the masks for all areas of type person
@@ -78,8 +91,6 @@ class SemanticSegmentation:
             int_concat = bool_concat.astype('uint8') * 255
             rgb_out = np.dstack([int_concat] * 3)
 
-            # Write video out
-            result_video.write(rgb_out)
 
             # Visualize gaze overlay plot
             img_converted = Image.fromarray(output)
@@ -90,15 +101,26 @@ class SemanticSegmentation:
             # plt.show()
 
             idx += 1
+            # Write video out
+            result_video.write(rgb_out)
 
             classification = Classification(distance)
-            frame_result = FrameResult(index, name, [classification])
+            frame_result = FrameResult(index, classifier_name, [classification])
             self.analysis.results.append(frame_result)
 
-            if idx == 2:
-                print("DEBUG BREAK AFTER 2 FRAMES")
-                break
 
         result_video.release()
-        capture.release()
+        reader.release()
         cv2.destroyAllWindows()
+
+    def download_model(self) -> ClassifierLoader:
+        model = ClassifierLoader(
+            "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5",
+            "gazeclassify_data/models")
+        model.download_if_not_available()
+        return model
+
+
+@dataclass
+class PixellibTensorflowClassifier:
+    model_url: str = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"

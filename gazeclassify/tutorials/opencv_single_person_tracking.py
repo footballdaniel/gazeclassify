@@ -4,14 +4,17 @@ from typing import Optional, Tuple, List
 
 import cv2  # type: ignore
 
-from gazeclassify.core.services.model_loader import ModelLoader
+from gazeclassify.services.model_loader import ClassifierLoader
 
 # Sources
 # https://github.com/faizancodes/NBA-Pose-Estimation-Analysis
 # https://cv-tricks.com/pose-estimation/using-deep-learning-in-opencv/
 
-ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
-            "~/gazeclassify_data/").download_if_not_available("pose_iter_160000.caffemodel")
+classifier = ClassifierLoader(
+    "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
+    "gazeclassify_data"
+)
+classifier.download_if_not_available()
 
 # Specify the paths for the 2 files
 protoFile = "pose_deploy_linevec_faster_4_stages.prototxt"
@@ -23,7 +26,7 @@ weightsFile = os.path.expanduser("~/gazeclassify_data/") + "pose_iter_160000.caf
 net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
 
 # Read image
-frame = cv2.imread("../../example_data/frame.jpg", cv2.IMREAD_UNCHANGED)
+frame = cv2.imread("../example_data/frame.jpg", cv2.IMREAD_UNCHANGED)
 
 # Resize image to analyze
 frame = cv2.resize(frame, (600, 600))

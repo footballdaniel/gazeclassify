@@ -7,5 +7,5 @@
 #         FrameResult([Classification("background", 1), Classification("background", 1)])
 #     ]
 #
-#     serializer = JsonSerializer()
-#     serializer.encode(results, "try.json")
+#     eyetracker = JsonSerializer()
+#     eyetracker.encode(results, "try.json")

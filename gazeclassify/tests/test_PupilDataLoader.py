@@ -1,4 +1,4 @@
-from gazeclassify.serializer.pupil_data_loader import PupilDataLoader
+from gazeclassify.eyetracker.pupil_data_loader import PupilDataLoader
 
 
 class Test_PupilDataLoader_WorldFramesCSV:
