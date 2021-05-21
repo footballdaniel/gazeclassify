@@ -9,7 +9,7 @@ from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.domain.dataset import NullDataset, Dataset
-from gazeclassify.service.deletion import FileDeleter
+from gazeclassify.service.deletion import Deleter
 from gazeclassify.domain.results import JsonSerializer, FrameResult, CSVSerializer
 
 import logging
@@ -22,7 +22,6 @@ class Analysis:
     result_path: Path = data_path.joinpath("results")
     results: List[FrameResult] = field(default_factory=list)
     dataset: Dataset = NullDataset()
-
 
 
     def save_to_json(self) -> Analysis:
@@ -39,14 +38,9 @@ class Analysis:
         serializer.encode(self.results, result_filename)
         return self
 
-
     def clear_data(self) -> Analysis:
-        FileDeleter().clear_files(self.data_path, "*.mp4")
-        FileDeleter().clear_files(self.data_path, "*.json")
-        return self
-
-    def set_logger(self, level: Union[int, str]) -> Analysis:
-        logging.basicConfig(level=level, format='%(levelname)s: %(message)s')
+        Deleter().clear_directory(self.result_path)
+        Deleter().clear_directory(self.video_path)
         return self
 
     def add_result(self, result: FrameResult) -> None:

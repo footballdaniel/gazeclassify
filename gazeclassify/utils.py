@@ -3,11 +3,13 @@ import sys
 import time
 from contextlib import contextmanager
 from logging import Logger
-from typing import Iterator, Optional, Set
+from typing import Iterator, Optional, Set, Union
 
 import numpy as np  # type: ignore
 from tqdm import tqdm  # type: ignore
 
+def set_logger(level: Union[int, str]) -> None:
+    logging.basicConfig(level=level, format='%(levelname)s: %(message)s')
 
 class ProgressBar(tqdm):  # type: ignore
     """

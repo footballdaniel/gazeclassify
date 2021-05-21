@@ -1,7 +1,4 @@
-from gazeclassify.service.analysis import Analysis
-from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
-from gazeclassify.classifier.semantic import SemanticSegmentation
-from gazeclassify.classifier.instance import InstanceSegmentation
+from gazeclassify import Analysis, PupilInvisibleLoader, SemanticSegmentation, InstanceSegmentation
 
 analysis = Analysis()
 
