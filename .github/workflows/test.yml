@@ -30,7 +30,7 @@ jobs:
         sudo apt-get install python3-opencv
     - name: Test with pytest
       run: |
-        pytest gazeclassify
+        pytest
     - name: Test with mypy
       run: |
         mypy gazeclassify --strict
