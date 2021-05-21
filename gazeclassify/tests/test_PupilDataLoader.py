@@ -1,4 +1,4 @@
-from gazeclassify.eyetracker.pupil_data_loader import PupilDataLoader
+from gazeclassify.eyetracker.pupilinvisible import PupilDataLoader
 
 
 class Test_PupilDataLoader_WorldFramesCSV:

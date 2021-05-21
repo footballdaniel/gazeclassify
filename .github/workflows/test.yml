@@ -33,4 +33,4 @@ jobs:
         pytest
     - name: Test with mypy
       run: |
-        mypy gazeclassify --strict --implicit-reexport
+        mypy gazeclassify --strict
