@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from gazeclassify.services.timestamp_matcher import TimestampMatcher
+from gazeclassify.service.timestamp_matcher import TimestampMatcher
 
 
 class Builder:

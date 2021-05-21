@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from gazeclassify.services.analysis import FileDeleter
+from gazeclassify.service.deletion import FileDeleter
 
 
 def test_create_file_and_delete() -> None:

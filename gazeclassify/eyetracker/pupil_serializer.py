@@ -9,7 +9,7 @@ import numpy as np  # type: ignore
 
 from gazeclassify.domain.dataset import Dataset, Metadata, GazeData, DataRecord, VideoData
 from gazeclassify.domain.serialization import Serializer
-from gazeclassify.services.timestamp_matcher import TimestampMatcher
+from gazeclassify.service.timestamp_matcher import TimestampMatcher
 from gazeclassify.utils import memory_logging
 
 

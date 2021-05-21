@@ -4,13 +4,13 @@ from typing import Optional, Tuple, List
 
 import cv2  # type: ignore
 
-from gazeclassify.services.model_loader import ClassifierLoader
+from gazeclassify.service.model_loader import ModelLoader
 
 # Sources
 # https://github.com/faizancodes/NBA-Pose-Estimation-Analysis
 # https://cv-tricks.com/pose-estimation/using-deep-learning-in-opencv/
 
-classifier = ClassifierLoader(
+classifier = ModelLoader(
     "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
     "gazeclassify_data"
 )

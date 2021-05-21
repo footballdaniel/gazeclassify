@@ -10,7 +10,7 @@ import ffmpeg  # type: ignore
 import numpy as np  # type: ignore
 
 from gazeclassify.domain.repository import EyeTrackingDataRepository
-from gazeclassify.services.analysis import Analysis
+from gazeclassify.service.analysis import Analysis
 from gazeclassify.eyetracker.pupil_serializer import PupilInvisibleSerializer
 
 

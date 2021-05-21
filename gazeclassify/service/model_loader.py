@@ -1,13 +1,14 @@
-import logging
 from dataclasses import dataclass
 from pathlib import Path
 from urllib import request
 
 from tqdm import tqdm  # type: ignore
 
+from utils import ProgressBar
+
 
 @dataclass
-class ClassifierLoader:
+class ModelLoader:
     model_url: str = ""
     download_path: str = "gazeclassify_data/models"
 
@@ -50,14 +51,3 @@ class ClassifierLoader:
                 self.file_path,
                 reporthook=t.update_to
             )
-
-class ProgressBar(tqdm):  # type: ignore
-    """
-    Source: https://gist.github.com/leimao/37ff6e990b3226c2c9670a2cd1e4a6f5
-    """
-
-    def update_to(self, b: int = 1, bsize: int = 1, tsize: None =None) -> None:
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-

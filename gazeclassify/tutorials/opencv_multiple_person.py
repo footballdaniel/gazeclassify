@@ -6,7 +6,7 @@ import os
 import cv2
 import numpy as np
 
-from gazeclassify.services import ModelLoader
+from gazeclassify.service import ModelLoader
 
 ModelLoader("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
             "~/gazeclassify_data/").download_if_not_available("pose_iter_160000.caffemodel")

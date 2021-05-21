@@ -5,9 +5,9 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
 
-from gazeclassify.services.model_loader import ClassifierLoader
+from gazeclassify.service.model_loader import ModelLoader
 
-classifier = ClassifierLoader(
+classifier = ModelLoader(
     "http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/mpi/pose_iter_160000.caffemodel",
     "gazeclassify_data"
 )

@@ -14,13 +14,14 @@ setuptools.setup(
         'pixellib>=0.6.1',
         'ffmpeg-python>=0.2.0',
         'opencv-python>=4.5.1.48',
-        'Pillow>=8.1.0'
+        'Pillow>=8.1.0',
+        'tqdm>=4.59.0'
     ],
     tests_require=['pytest'],
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/footballdaniel/gazeclassify",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude="*tutorials"),
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
@@ -32,5 +33,5 @@ setuptools.setup(
         "Topic :: Scientific/Engineering",
     ],
     python_requires=">=3.6",
-    package_data={'gazeclassify': ['example_data/*']}
+    package_data={'gazeclassify': ['example_data/*']},
 )

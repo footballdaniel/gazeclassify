@@ -1,5 +1,5 @@
-from gazeclassify.services.analysis import Analysis
-from gazeclassify.services.instance_classifier import InstanceSegmentation
+from gazeclassify.service.analysis import Analysis
+from gazeclassify.classifier.instance import InstanceSegmentation
 from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
 
 

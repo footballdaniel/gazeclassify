@@ -4,7 +4,7 @@ import tensorflow as tf  # type: ignore
 from pixellib.instance import instance_segmentation, configuration  # type: ignore
 from pixellib.mask_rcnn import MaskRCNN  # type: ignore
 
-from gazeclassify.thirdparty.pixellib.modeldownload import ModelDownload
+from gazeclassify.tutorials.model_download import ModelDownload
 
 def main() -> None:
     tf.get_logger().setLevel(logging.WARNING)

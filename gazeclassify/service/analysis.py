@@ -1,5 +1,3 @@
-import glob
-import os
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Union
@@ -10,7 +8,8 @@ from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.domain.dataset import NullDataset, Dataset
-from gazeclassify.services.results import JsonSerializer, FrameResult
+from gazeclassify.service.deletion import FileDeleter
+from gazeclassify.service.results import JsonSerializer, FrameResult
 
 import logging
 
@@ -33,11 +32,3 @@ class Analysis:
 
     def add_result(self, result: FrameResult) -> None:
         self.results.append(result)
-
-@dataclass
-class FileDeleter:
-
-    def clear_files(self, data_path: Path, type: str = "*.mp4") -> None:
-        for filepath in glob.glob(os.path.join(str(data_path), type)):
-            os.remove(filepath)
-

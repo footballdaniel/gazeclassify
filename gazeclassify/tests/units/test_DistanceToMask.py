@@ -1,6 +1,6 @@
 import numpy as np  # type: ignore
 
-from gazeclassify.services.gaze_distance import DistanceToShape
+from gazeclassify.service.gaze_distance import DistanceToShape
 
 
 class Test_Measuring2DDistanceGazeTo_Shape:
