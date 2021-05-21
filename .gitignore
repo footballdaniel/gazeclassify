@@ -2,7 +2,6 @@
 .raw_data/
 .vscode/
 .raw_pixellib/
-pixellib.py
 image*.jpg
 venvpixellib/
 .idea/
