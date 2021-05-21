@@ -1,6 +1,6 @@
-from gazeclassify.service.analysis import Analysis
 from gazeclassify.classifier.instance import InstanceSegmentation
 from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
+from gazeclassify.service.analysis import Analysis
 
 
 def test_run_instance_segmentation_on_two_frame_trial() -> None:

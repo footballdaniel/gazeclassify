@@ -1,7 +1,6 @@
-import gazeclassify
-from gazeclassify.service.analysis import Analysis
-from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
 from gazeclassify.classifier.semantic import SemanticSegmentation
+from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
+from gazeclassify.service.analysis import Analysis
 
 
 def test_run_semantic_segmentation_on_two_frame_trial() -> None:
