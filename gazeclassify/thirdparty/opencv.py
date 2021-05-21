@@ -9,7 +9,7 @@ from gazeclassify.domain.dataset import DataRecord
 from gazeclassify.domain.video import VideoWriter, VideoReader
 from gazeclassify.service.gaze_distance import DistanceToPoint
 from gazeclassify.service.model_loader import ModelLoader
-from gazeclassify.service.results import Classification, InstanceClassification
+from gazeclassify.domain.results import Classification, InstanceClassification
 
 
 @dataclass

@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List, Optional, Dict, Any
 
 
@@ -21,9 +22,15 @@ class FrameResult:
     classifications: List[Classification] = field(default_factory=list)
 
 
+class CSVSerializer:
+    def encode(self, data: List[FrameResult], filename: Path) -> None:
+        print("NOT IMPLEMNTEND CSV Serialization")
+        pass
+
+
 class JsonSerializer:
-    def encode(self, data: object, filename: str = "try.json") -> None:
-        with open(filename, "w") as write_file:
+    def encode(self, data: object, filename: Path) -> None:
+        with open(str(filename), "w") as write_file:
             json.dump(
                 data,
                 write_file,
@@ -35,5 +42,4 @@ class JsonSerializer:
 
 class ClassesToDictEncoder(json.JSONEncoder):
     def default(self, obj: object) -> Dict[Any, Any]:
-            return obj.__dict__
-
+        return obj.__dict__

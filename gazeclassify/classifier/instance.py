@@ -8,7 +8,7 @@ from tqdm import tqdm  # type: ignore
 from gazeclassify.domain.classification import Algorithm
 from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
-from gazeclassify.service.results import FrameResult
+from gazeclassify.domain.results import FrameResult
 from gazeclassify.thirdparty.opencv import OpenCVClassifier, OpenCVReader, OpenCVWriter
 
 

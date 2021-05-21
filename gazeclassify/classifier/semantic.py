@@ -9,7 +9,7 @@ from gazeclassify.domain.classification import Algorithm
 from gazeclassify.domain.video import VideoReader, VideoWriter
 from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
-from gazeclassify.service.results import Classification, FrameResult
+from gazeclassify.domain.results import Classification, FrameResult
 from gazeclassify.thirdparty.opencv import OpenCVReader, OpenCVWriter
 from gazeclassify.thirdparty.pixellib import PixellibTensorflowClassifier
 
