@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import cv2  # type: ignore
+from tqdm import tqdm  # type: ignore
 
 from gazeclassify.domain.classification import Algorithm
 from gazeclassify.domain.video import VideoReader, VideoWriter
@@ -27,16 +28,16 @@ class SemanticSegmentation(Algorithm):
         reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
         model = self._download_model()
 
-        for idx, record in enumerate(self.analysis.dataset.records):
-            logging.info(f"Semantic segmentation at frame: {idx}")
+        for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Semantic segmentation")):
             frame = reader.next_frame()
+            if not reader.has_frame:
+                logging.error("Video has ended prematurely")
 
             classifier = PixellibTensorflowClassifier(model)
             classifier.set_target()
             frame = classifier.classify_frame(frame)
             result = classifier.gaze_distance_to_object(record)
             writer.write(frame)
-
             results = Classification(result)
             frame_result = FrameResult(idx, classifier_name, [results])
             self.analysis.results.append(frame_result)

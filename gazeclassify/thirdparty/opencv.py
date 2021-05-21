@@ -111,10 +111,26 @@ class OpenCVClassifier:
                 cv2.line(frame, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
         return frame
 
+    def _cuda_ready_devices(self) -> int:
+        try:
+            count = cv2.cuda.getCudaEnabledDeviceCount()
+            if count > 0:
+                return 1
+            else:
+                return 0
+        except:
+            return 0
+
     def _classify_with_dnn(self, frame: np.ndarray) -> np.ndarray:
         net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
-        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+        cuda_devices = self._cuda_ready_devices()
+
+        if cuda_devices > 0:
+            net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+        else:
+            net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
+
         inHeight = 368
         inWidth = int((inHeight / self._frame_height) * self._frame_width)
         inpBlob = cv2.dnn.blobFromImage(frame, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
