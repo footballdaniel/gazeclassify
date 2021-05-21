@@ -16,7 +16,6 @@ from thirdparty.pixellib import PixellibTensorflowClassifier
 @dataclass
 class SemanticSegmentation(Algorithm):
     _analysis: Analysis
-    video_filepath: Path = Path.home().joinpath("gazeclassify_data/videos")
     model_url: str = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"
 
     @property
@@ -29,7 +28,7 @@ class SemanticSegmentation(Algorithm):
         model = self._download_model()
 
         for idx, record in enumerate(self.analysis.dataset.records):
-            logging.info(f"Instance segmentation at frame: {idx}")
+            logging.info(f"Semantic segmentation at frame: {idx}")
             frame = reader.next_frame()
 
             classifier = PixellibTensorflowClassifier(model)
@@ -60,10 +59,9 @@ class SemanticSegmentation(Algorithm):
         return reader
 
     def _setup_video_writer(self, classifier_name: str) -> VideoWriter:
-        Path.mkdir(self.video_filepath, parents=True, exist_ok=True)
-        video_target = f"gazeclassify_data/videos/{classifier_name}.mp4"
-        video_path = Path.home().joinpath(video_target)
-        writer = OpenCVWriter(video_path)
+        Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
+        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.mp4")
+        writer = OpenCVWriter(video_target)
         world_video = self.analysis.dataset.world_video
         writer.initiate(world_video.width, world_video.height)
         return writer

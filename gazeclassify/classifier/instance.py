@@ -58,9 +58,9 @@ class InstanceSegmentation(Algorithm):
         return reader
 
     def _setup_video_writer(self, classifier_name: str) -> OpenCVWriter:
-        video_target = f"gazeclassify_data/video/{classifier_name}.mp4"
-        video_path = Path.home().joinpath(video_target)
-        writer = OpenCVWriter(video_path)
+        Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
+        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.mp4")
+        writer = OpenCVWriter(video_target)
         world_video = self.analysis.dataset.world_video
         writer.initiate(world_video.width, world_video.height)
         return writer

@@ -3,7 +3,7 @@ from gazeclassify.eyetracker.pupil_data_loader import PupilInvisibleLoader
 from gazeclassify.classifier.semantic import SemanticSegmentation
 from gazeclassify.classifier.instance import InstanceSegmentation
 
-analysis = Analysis()
+analysis = Analysis().set_logger("INFO")
 
 PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data")
 
