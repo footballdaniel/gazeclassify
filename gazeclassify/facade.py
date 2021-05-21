@@ -5,7 +5,7 @@ from gazeclassify.classifier.instance import InstanceSegmentation
 
 analysis = Analysis().set_logger("INFO")
 
-PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data")
+PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data/trial")
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")

@@ -32,10 +32,7 @@ class DistanceToPoint:
         if (self.point_x == None) | (self.point_y == None):
             return None
 
-        print("UNTESTED FUNCTION")
-
-
         point = [self.point_x, self.point_y]
         gaze = [gaze_x, gaze_y]
-        euclidean_distance = math.sqrt(((gaze[0]-point[0])**2)+((gaze[1]-point[1])**2) )
+        euclidean_distance = math.sqrt(((gaze[0] - point[0]) ** 2) + ((gaze[1] - point[1]) ** 2))
         return euclidean_distance

@@ -67,10 +67,8 @@ class OpenCVClassifier:
                     continue
                 B = np.int32(self.keypoints_list[index.astype(int), 0])
                 A = np.int32(self.keypoints_list[index.astype(int), 1])
-
                 point_x = B[0]
                 point_y = A[0]
-
                 distance = DistanceToPoint(point_x, point_y).distance_2d(record.gaze.x, record.gaze.y)
                 classification = InstanceClassification(distance, keypointsMapping[i], n)
                 results.append(classification)
@@ -79,14 +77,11 @@ class OpenCVClassifier:
     def classify_frame(self, frame: np.ndarray, threshold: float = 0.1) -> np.ndarray:
         self._frame_width = frame.shape[1]
         self._frame_height = frame.shape[0]
-
         classified_image = self._classify_with_dnn(frame)
         self._detect_keypoints(classified_image, threshold)
         self._get_valid_keypoint_pairs(classified_image)
         self._get_personwise_keypoints()
-
         visualized_frame = self._visualize(frame)
-
         return visualized_frame
 
     def _get_keypoints_mapping(self) -> List[str]:
@@ -120,7 +115,6 @@ class OpenCVClassifier:
         net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
         net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
         net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-
         inHeight = 368
         inWidth = int((inHeight / self._frame_height) * self._frame_width)
         inpBlob = cv2.dnn.blobFromImage(frame, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
@@ -130,8 +124,6 @@ class OpenCVClassifier:
 
     def _detect_keypoints(self, classified_image: np.ndarray, threshold: float) -> None:
         nPoints = 18
-        keypointsMapping = self._get_keypoints_mapping_raw()
-
         detected_keypoints = []
         keypoints_list = np.zeros((0, 3))
         keypoint_id = 0
@@ -139,7 +131,6 @@ class OpenCVClassifier:
             probMap = classified_image[0, part, :, :]
             probMap = cv2.resize(probMap, (self._frame_width, self._frame_height))
             keypoints = self._get_keypoints(probMap, threshold)
-            print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
             keypoints_with_id = []
             for i in range(len(keypoints)):
                 keypoints_with_id.append(keypoints[i] + (keypoint_id,))
@@ -242,7 +233,6 @@ class OpenCVClassifier:
 
                 valid_pairs.append(valid_pair)
             else:
-                print("No Connection : k = {}".format(k))
                 invalid_pairs.append(k)
                 valid_pairs.append([])
         self.valid_pairs = valid_pairs

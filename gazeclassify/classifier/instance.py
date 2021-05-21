@@ -46,7 +46,6 @@ class InstanceSegmentation(Algorithm):
             frame_results = FrameResult(idx, classifier_name, results)
             self.analysis.add_result(frame_results)
             writer.write(frameClone)
-            idx += 1
 
         writer.release()
         reader.release()
@@ -68,13 +67,13 @@ class InstanceSegmentation(Algorithm):
     def _download_model_weights(self) -> ModelLoader:
         model_weights = ModelLoader(
             "https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-caffe-models/raw/master/caffe_models/openpose/caffe_model/pose_iter_440000.caffemodel",
-            "gazeclassify_data/models")
+            str(self.analysis.model_path))
         model_weights.download_if_not_available()
         return model_weights
 
     def _download_model_prototype(self) -> ModelLoader:
         model_prototype = ModelLoader(
             "https://raw.githubusercontent.com/spmallick/learnopencv/master/OpenPose-Multi-Person/pose/coco/pose_deploy_linevec.prototxt",
-            "gazeclassify_data/models")
+            str(self.analysis.model_path))
         model_prototype.download_if_not_available()
         return model_prototype

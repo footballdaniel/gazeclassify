@@ -4,7 +4,7 @@ from urllib import request
 
 from tqdm import tqdm  # type: ignore
 
-from utils import ProgressBar
+from gazeclassify.utils import ProgressBar
 
 
 @dataclass

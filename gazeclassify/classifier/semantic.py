@@ -10,7 +10,7 @@ from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
 from gazeclassify.service.results import Classification, FrameResult
 from gazeclassify.thirdparty.opencv import OpenCVReader, OpenCVWriter
-from thirdparty.pixellib import PixellibTensorflowClassifier
+from gazeclassify.thirdparty.pixellib import PixellibTensorflowClassifier
 
 
 @dataclass
@@ -40,7 +40,6 @@ class SemanticSegmentation(Algorithm):
             results = Classification(result)
             frame_result = FrameResult(idx, classifier_name, [results])
             self.analysis.results.append(frame_result)
-            idx += 1
 
         writer.release()
         reader.release()
@@ -49,7 +48,7 @@ class SemanticSegmentation(Algorithm):
     def _download_model(self) -> ModelLoader:
         model = ModelLoader(
             "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5",
-            "gazeclassify_data/models")
+            str(self.analysis.model_path))
         model.download_if_not_available()
         return model
 
