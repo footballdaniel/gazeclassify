@@ -57,7 +57,7 @@ class InstanceSegmentation(Algorithm):
 
     def _setup_video_writer(self, classifier_name: str) -> OpenCVWriter:
         Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
-        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.mp4")
+        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.avi")
         writer = OpenCVWriter(video_target)
         world_video = self.analysis.dataset.world_video
         writer.initiate(world_video.width, world_video.height)

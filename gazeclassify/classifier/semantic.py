@@ -16,6 +16,11 @@ from gazeclassify.thirdparty.pixellib import PixellibTensorflowClassifier
 
 @dataclass
 class SemanticSegmentation(Algorithm):
+    """
+    An implementation of the Mask-RCNN algorithm run with the tensorflow backend
+    Sources:
+        https://pixellib.readthedocs.io/en/latest/video_instance.html#instance-segmentation-of-live-camera-with-mask-r-cnn
+    """
     _analysis: Analysis
     model_url: str = "https://github.com/ayoolaolafenwa/PixelLib/releases/download/1.2/mask_rcnn_coco.h5"
 
@@ -60,7 +65,7 @@ class SemanticSegmentation(Algorithm):
 
     def _setup_video_writer(self, classifier_name: str) -> VideoWriter:
         Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
-        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.mp4")
+        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.avi")
         writer = OpenCVWriter(video_target)
         world_video = self.analysis.dataset.world_video
         writer.initiate(world_video.width, world_video.height)

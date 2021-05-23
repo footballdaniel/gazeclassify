@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
@@ -17,7 +18,7 @@ class OpenCVWriter(VideoWriter):
     target_file: Path
 
     def initiate(self, video_width: int, video_height: int) -> None:
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*'DIVX')
         self.result_video = cv2.VideoWriter(str(self.target_file), fourcc, 10, (video_width, video_height))
 
     def write(self, frame: np.ndarray) -> None:

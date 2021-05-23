@@ -10,4 +10,4 @@ PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data/tria
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
 
-analysis.save_to_json()
+analysis.save_to_csv()

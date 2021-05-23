@@ -10,7 +10,8 @@ from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.domain.dataset import NullDataset, Dataset
 from gazeclassify.service.deletion import Deleter
-from gazeclassify.domain.results import JsonSerializer, FrameResult, CSVSerializer
+from gazeclassify.domain.results import FrameResult
+from gazeclassify.domain.serialization import CSVSerializer, JsonSerializer
 
 import logging
 
@@ -27,14 +28,15 @@ class Analysis:
     def save_to_json(self) -> Analysis:
         serializer = JsonSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
-        result_filename = self.result_path.joinpath(f"{self.dataset.metadata.recording_name}.json")
+        result_filename = self.result_path.joinpath("Result.json")
         serializer.encode(self.results, result_filename)
         return self
 
     def save_to_csv(self) -> Analysis:
+        logging.info(f"Writing results to: {str(self.result_path)}")
         serializer = CSVSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
-        result_filename = self.result_path.joinpath(f"{self.dataset.metadata.recording_name}.json")
+        result_filename = self.result_path.joinpath("Result.csv")
         serializer.encode(self.results, result_filename)
         return self
 
