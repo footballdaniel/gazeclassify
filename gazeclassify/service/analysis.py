@@ -1,7 +1,9 @@
 from __future__ import annotations
-from pathlib import Path
+
+import logging
 from dataclasses import dataclass, field
-from typing import List, Union
+from pathlib import Path
+from typing import List
 
 import cv2  # type: ignore
 import numpy as np  # type: ignore
@@ -9,11 +11,10 @@ from PIL import Image  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.domain.dataset import NullDataset, Dataset
-from gazeclassify.service.deletion import Deleter
 from gazeclassify.domain.results import FrameResult
 from gazeclassify.domain.serialization import CSVSerializer, JsonSerializer
+from gazeclassify.service.deletion import Deleter
 
-import logging
 
 @dataclass
 class Analysis:
@@ -24,8 +25,8 @@ class Analysis:
     results: List[FrameResult] = field(default_factory=list)
     dataset: Dataset = NullDataset()
 
-
     def save_to_json(self) -> Analysis:
+        logging.info(f"Writing results to: {str(self.result_path)}")
         serializer = JsonSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
         result_filename = self.result_path.joinpath("Result.json")

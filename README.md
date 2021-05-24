@@ -11,14 +11,11 @@ GazeClassify is a package do facilitate the analysis of eye-tracking data. Anyon
 
 Gazeclassify currently supports only eye tracking data from the PupilInvisible eye tracker.
 ```python
-from gazeclassify.classifier.instance import InstanceSegmentation
-from gazeclassify.classifier.semantic import SemanticSegmentation
-from gazeclassify.eyetracker.pupilinvisible import PupilInvisibleLoader
-from gazeclassify.service.analysis import Analysis
+from gazeclassify import Analysis, PupilInvisibleLoader, SemanticSegmentation, InstanceSegmentation, example_trial
 
 analysis = Analysis()
 
-PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data/trial")
+PupilInvisibleLoader(analysis).from_trial_folder(example_trial())
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")

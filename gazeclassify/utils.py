@@ -6,10 +6,17 @@ from logging import Logger
 from typing import Iterator, Optional, Set, Union
 
 import numpy as np  # type: ignore
+import pkg_resources
 from tqdm import tqdm  # type: ignore
 
+
+def example_trial() -> str:
+    trial_filepath = pkg_resources.resource_filename('gazeclassify', 'example_data/trial')
+    return trial_filepath
+
 def set_logger(level: Union[int, str]) -> None:
-    logging.basicConfig(level=level, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=level, format='%(levelname)s: %(message)s (%(module)s)')
+
 
 class ProgressBar(tqdm):  # type: ignore
     """

@@ -33,13 +33,14 @@ class SemanticSegmentation(Algorithm):
         reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
         model = self._download_model()
 
+        classifier = PixellibTensorflowClassifier(model)
+        classifier.is_gpu_available()
+        classifier.set_target()
+
         for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Semantic segmentation")):
             frame = reader.next_frame()
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
-
-            classifier = PixellibTensorflowClassifier(model)
-            classifier.set_target()
             frame = classifier.classify_frame(frame)
             result = classifier.gaze_distance_to_object(record)
             writer.write(frame)

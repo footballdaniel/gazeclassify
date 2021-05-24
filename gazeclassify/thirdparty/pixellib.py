@@ -1,8 +1,10 @@
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Dict, Any
 
 import numpy as np  # type: ignore
+import tensorflow as tf  # type: ignore
 from PIL import Image  # type: ignore
 from matplotlib import pyplot as plt  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
@@ -29,6 +31,13 @@ class PixellibTensorflowClassifier:
         self.boolean_mask = np.any(segmask["masks"], axis=-1)
         classified_frame = self._mask_to_rgb()
         return classified_frame
+
+    def is_gpu_available(self) -> None:
+        list_gpu = tf.config.list_physical_devices('GPU')
+        if list_gpu == []:
+            logging.info("CUDA not available on GPU, falling back on slower CPU for semantic segmentation")
+        else:
+            logging.info("Using GPU for instance segmentation")
 
     def _get_frame_size(self, frame: np.ndarray) -> None:
         self.image_width = frame.shape[1]

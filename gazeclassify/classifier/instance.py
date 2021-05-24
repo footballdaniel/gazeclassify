@@ -34,12 +34,14 @@ class InstanceSegmentation(Algorithm):
         model_weights = self._download_model_weights()
         model_prototype = self._download_model_prototype()
 
+        classifier = OpenCVClassifier(model_weights, model_prototype)
+        classifier.is_gpu_available()
+
         for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Instance segmentation")):
             frame = reader.next_frame()
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
 
-            classifier = OpenCVClassifier(model_weights, model_prototype)
             frameClone = classifier.classify_frame(frame)
             results = classifier.gaze_distance_to_instance(record)
             frame_results = FrameResult(idx, classifier_name, results)

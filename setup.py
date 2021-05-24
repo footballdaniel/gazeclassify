@@ -1,11 +1,13 @@
-import setuptools   # type: ignore
+import setuptools  # type: ignore
+
+import gazeclassify
 
 with open("README.md", "r") as f:
     readme = f.read()
 
 setuptools.setup(
     name="gazeclassify",
-    version="0.4",
+    version=gazeclassify.__version__,
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
@@ -20,7 +22,7 @@ setuptools.setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/footballdaniel/gazeclassify",
-    packages=setuptools.find_packages(exclude=['*.tutorials', ]),
+    packages=setuptools.find_packages(exclude=['*.tutorials']),
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",

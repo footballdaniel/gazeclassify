@@ -85,6 +85,17 @@ class OpenCVClassifier:
         visualized_frame = self._visualize(frame)
         return visualized_frame
 
+    def is_gpu_available(self) -> None:
+        self.net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
+        cuda_devices = self._cuda_ready_devices()
+        if cuda_devices > 0:
+            self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+            logging.info("Using GPU for instance segmentation")
+        else:
+            self.net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
+            logging.info("CUDA not available on GPU, falling back on slower CPU for instance segmentation")
+
     def _get_keypoints_mapping(self) -> List[str]:
         keypointsMapping = ['Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist', 'Left Shoulder', 'Left Elbow',
                             'Left Wrist', 'Right Hip', 'Right Knee',
@@ -123,20 +134,11 @@ class OpenCVClassifier:
             return 0
 
     def _classify_with_dnn(self, frame: np.ndarray) -> np.ndarray:
-        net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
-        cuda_devices = self._cuda_ready_devices()
-
-        if cuda_devices > 0:
-            net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-        else:
-            net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
-
         inHeight = 368
         inWidth = int((inHeight / self._frame_height) * self._frame_width)
         inpBlob = cv2.dnn.blobFromImage(frame, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
-        net.setInput(inpBlob)
-        classified_image = net.forward()
+        self.net.setInput(inpBlob)
+        classified_image = self.net.forward()
         return classified_image
 
     def _detect_keypoints(self, classified_image: np.ndarray, threshold: float) -> None:
