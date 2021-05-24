@@ -30,11 +30,13 @@ python -m build # Build will be placed in /dist folder
 - Upload the package to the test server using `twine`:
 	```
 	python -m pip install --user --upgrade twine
+    python setup.py develop # Any dependencies in install_requires() have to be developed!
 	python -m twine upload --repository testpypi dist/*
 	```
-- Use uploaded test package locally
+- Use uploaded test package locally. Note that any packages defined in `install_requires` will need the extr-index-url.
+  The test server only searches for packages on the test server, and most of the packages are directly on the pypi server.
  	```
-	pip install -i https://test.pypi.org/simple/ gazeclassify
+    pip install -i https://test.pypi.org/simple/ gazeclassify --extra-index-url https://pypi.org/simple/
 	```
   - When prompted to use a username, type `__token__`
   - For the password, paste the token value from above and hit enter

@@ -1,22 +1,20 @@
 import setuptools  # type: ignore
 
-import gazeclassify
-
 with open("README.md", "r") as f:
     readme = f.read()
 
 setuptools.setup(
     name="gazeclassify",
-    version=gazeclassify.__version__,
+    version="0.5",
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
     install_requires=[
         'tensorflow>=2.4.1',
-        'pixellib>=0.6.1',
         'ffmpeg-python>=0.2.0',
-        'opencv-python>=4.5.1.48',
-        'tqdm>=4.59.0'
+        'tqdm>=4.60.0',
+        'opencv-python>=4.1.2',
+        'pixellib>=0.6.1'
     ],
     tests_require=['pytest'],
     long_description=readme,
@@ -27,7 +25,6 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "License :: OSI Approved",

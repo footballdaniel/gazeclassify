@@ -1,21 +1,9 @@
-import logging
-import sys
 import time
 from contextlib import contextmanager
 from logging import Logger
-from typing import Iterator, Optional, Set, Union
+from typing import Iterator, Optional
 
-import numpy as np  # type: ignore
-import pkg_resources
 from tqdm import tqdm  # type: ignore
-
-
-def example_trial() -> str:
-    trial_filepath = pkg_resources.resource_filename('gazeclassify', 'example_data/trial')
-    return trial_filepath
-
-def set_logger(level: Union[int, str]) -> None:
-    logging.basicConfig(level=level, format='%(levelname)s: %(message)s (%(module)s)')
 
 
 class ProgressBar(tqdm):  # type: ignore
@@ -45,34 +33,3 @@ def performance_logging(description: str, logger: Optional[Logger] = None) -> It
             logger.info(message)
         else:
             print(message)
-
-
-def inspect_recursively(instance: object, recursively_seen: Optional[Set[int]] = set()) -> int:
-    if recursively_seen is None:
-        recursively_seen = set()
-    size = sys.getsizeof(instance)
-    obj_id = id(instance)
-    if obj_id in recursively_seen:
-        return 0
-    recursively_seen.add(obj_id)
-    if isinstance(instance, np.ndarray):
-        size += instance.nbytes
-    elif isinstance(instance, dict):
-        size += sum([inspect_recursively(v, recursively_seen) for v in instance.values()])
-        size += sum([inspect_recursively(k, recursively_seen) for k in instance.keys()])
-    elif hasattr(instance, '__dict__'):
-        size += inspect_recursively(instance.__dict__, recursively_seen)
-    elif hasattr(instance, '__iter__') and not isinstance(instance, (str, bytes, bytearray)):
-        size += sum([inspect_recursively(i, recursively_seen) for i in instance])  # type: ignore
-    return size
-
-
-def memory_logging(description: str, instance: object, logger: Optional[Logger] = None) -> None:
-    object_size = float(inspect_recursively(instance))
-    object_size /= 1000
-    unit = "kilobytes"
-    message = f"{description} size: {object_size:.1f} {unit}"
-    if logger:
-        logging.info(message)
-    else:
-        print(message)
