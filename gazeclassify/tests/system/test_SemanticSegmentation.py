@@ -10,5 +10,5 @@ def test_run_semantic_segmentation_on_two_frame_trial() -> None:
 
     import json
     results = json.dumps(analysis.results, default=lambda x: x.__dict__)
-    expected_classification = '[{"frame_id": 0, "name": "Human_Shape", "classifications": [{"distance": 64.0788294513828}]}, {"frame_id": 1, "name": "Human_Shape", "classifications": [{"distance": 68.18250922307814}]}]'
+    expected_classification = '[{"frame_id": 0, "name": "Human_Shape", "classifications": [{"distance": 0.1741947770194003}]}, {"frame_id": 1, "name": "Human_Shape", "classifications": [{"distance": 0.21096293861090812}]}]'
     assert results == expected_classification

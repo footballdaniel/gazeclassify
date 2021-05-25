@@ -7,10 +7,11 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 
 from gazeclassify.domain.dataset import DataRecord
+from gazeclassify.domain.results import Classification, InstanceClassification
 from gazeclassify.domain.video import VideoWriter, VideoReader
 from gazeclassify.service.gaze_distance import DistanceToPoint
 from gazeclassify.service.model_loader import ModelLoader
-from gazeclassify.domain.results import Classification, InstanceClassification
+from gazeclassify.thirdparty.pixellib_api import ScatterImage
 
 
 @dataclass
@@ -49,6 +50,7 @@ class OpenCVReader(VideoReader):
     def release(self) -> None:
         self.capture.release()
 
+
 @dataclass
 class OpenCVClassifier:
     model_weights: ModelLoader
@@ -70,7 +72,11 @@ class OpenCVClassifier:
                 A = np.int32(self.keypoints_list[index.astype(int), 1])
                 point_x = B[0]
                 point_y = A[0]
-                distance = DistanceToPoint(point_x, point_y).distance_2d(record.gaze.x, record.gaze.y)
+
+                self.pixel_x = record.gaze.x * self._frame_width
+                self.pixel_y = self._frame_height - (record.gaze.y * self._frame_height)  # flip vertically
+
+                distance = DistanceToPoint(point_x, point_y).distance_2d(self.pixel_x, self.pixel_y)
                 classification = InstanceClassification(distance, keypointsMapping[i], n)
                 results.append(classification)
         return results  # type: ignore
@@ -84,6 +90,9 @@ class OpenCVClassifier:
         self._get_personwise_keypoints()
         visualized_frame = self._visualize(frame)
         return visualized_frame
+
+    def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:
+        return ScatterImage(image).scatter(self.pixel_x, self.pixel_y)
 
     def is_gpu_available(self) -> None:
         self.net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))

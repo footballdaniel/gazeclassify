@@ -5,16 +5,17 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="gazeclassify",
-    version="0.5",
+    version="0.6",
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
     install_requires=[
         'tensorflow>=2.4.1',
         'ffmpeg-python>=0.2.0',
-        'tqdm>=4.60.0',
         'opencv-python>=4.1.2',
-        'pixellib>=0.6.1'
+        'pixellib>=0.6.1',
+        'tqdm>=4.60.0',
+        'moviepy>=1.0.3'
     ],
     tests_require=['pytest'],
     long_description=readme,

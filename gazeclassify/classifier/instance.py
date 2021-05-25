@@ -9,7 +9,7 @@ from gazeclassify.domain.classification import Algorithm
 from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
 from gazeclassify.domain.results import FrameResult
-from gazeclassify.thirdparty.opencv import OpenCVClassifier, OpenCVReader, OpenCVWriter
+from gazeclassify.thirdparty.opencv_api import OpenCVClassifier, OpenCVReader, OpenCVWriter
 
 
 @dataclass
@@ -44,6 +44,7 @@ class InstanceSegmentation(Algorithm):
 
             frameClone = classifier.classify_frame(frame)
             results = classifier.gaze_distance_to_instance(record)
+            frameClone = classifier.visualize_gaze_overlay(frameClone)
             frame_results = FrameResult(idx, classifier_name, results)
             self.analysis.add_result(frame_results)
             writer.write(frameClone)

@@ -1,12 +1,14 @@
 import logging
+import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Dict, Any
 
+import cv2  # type: ignore
 import numpy as np  # type: ignore
 import tensorflow as tf  # type: ignore
 from PIL import Image  # type: ignore
-from matplotlib import pyplot as plt  # type: ignore
+from matplotlib import pyplot as plt, pyplot  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
 from gazeclassify.domain.dataset import DataRecord
@@ -69,9 +71,17 @@ class PixellibTensorflowClassifier:
         self.segment_image.load_model(self.model_weights.file_path)
         self.target_classes = self.segment_image.select_target_classes(person=True)
 
-    def _visualize_gaze_overlay(self, output: np.ndarray) -> None:
-        img_converted = Image.fromarray(output)
-        plt.imshow(img_converted)
-        plt.scatter(self.pixel_x, self.pixel_y)
-        img_converted.show()
-        plt.show()
+    def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:
+        return ScatterImage(image).scatter(self.pixel_x, self.pixel_y)
+
+
+@dataclass
+class ScatterImage:
+    image: np.ndarray
+
+    def scatter(self, x: float, y: float) -> np.ndarray:
+        red = (0, 0, 255)  # BGR
+        radius = math.ceil(self.image.shape[0] / 100)
+        filled = -1
+        image = cv2.circle(self.image, (int(x), int(y)), radius=radius, color=red, thickness=filled)
+        return image

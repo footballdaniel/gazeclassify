@@ -8,3 +8,4 @@ SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
 
 analysis.save_to_csv()
+analysis.export_video()

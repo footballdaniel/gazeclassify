@@ -9,7 +9,7 @@ PiPy package to algorithmically analyze eye-tracking data.
 ### What is GazeClassify?
 GazeClassify is a package do facilitate the analysis of eye-tracking data. Anyone can analyze gaze data online with less than 10 lines of code. GazeClassify provides a way to automatize and standardize eye-tracking analysis.
 
-Gazeclassify currently supports only eye tracking data from the PupilInvisible eye tracker.
+Gazeclassify currently supports only eye tracking data from the PupilInvisible eye tracker. Support for other eye trackers is planned in short future.
 ```python
 from gazeclassify import Analysis, PupilInvisibleLoader, SemanticSegmentation, InstanceSegmentation, example_trial
 

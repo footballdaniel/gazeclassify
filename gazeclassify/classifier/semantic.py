@@ -10,8 +10,8 @@ from gazeclassify.domain.video import VideoReader, VideoWriter
 from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
 from gazeclassify.domain.results import Classification, FrameResult
-from gazeclassify.thirdparty.opencv import OpenCVReader, OpenCVWriter
-from gazeclassify.thirdparty.pixellib import PixellibTensorflowClassifier
+from gazeclassify.thirdparty.opencv_api import OpenCVReader, OpenCVWriter
+from gazeclassify.thirdparty.pixellib_api import PixellibTensorflowClassifier
 
 
 @dataclass
@@ -43,6 +43,7 @@ class SemanticSegmentation(Algorithm):
                 logging.error("Video has ended prematurely")
             frame = classifier.classify_frame(frame)
             result = classifier.gaze_distance_to_object(record)
+            frame = classifier.visualize_gaze_overlay(frame)
             writer.write(frame)
             results = Classification(result)
             frame_result = FrameResult(idx, classifier_name, [results])

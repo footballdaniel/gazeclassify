@@ -7,7 +7,7 @@ import cv2  # type: ignore
 import numpy as np  # type: ignore
 from pixellib.instance import instance_segmentation  # type: ignore
 
-from gazeclassify.thirdparty.pixellib import InferSpeed
+from gazeclassify.thirdparty.pixellib_api import InferSpeed
 from gazeclassify.tutorials.model_download import ModelDownload
 
 

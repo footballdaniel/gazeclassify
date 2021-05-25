@@ -6,3 +6,7 @@ opencv-python>=4.5.1.48
 Pillow>=8.1.0
 pytest>=6.2.4
 tqdm>=4.59.0
+gazeclassify~=0.5
+matplotlib~=3.3.4
+setuptools~=57.0.0
+moviepy~=1.0.3

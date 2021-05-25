@@ -14,6 +14,7 @@ from gazeclassify.domain.dataset import NullDataset, Dataset
 from gazeclassify.domain.results import FrameResult
 from gazeclassify.domain.serialization import CSVSerializer, JsonSerializer
 from gazeclassify.service.deletion import Deleter
+from gazeclassify.thirdparty.moviepy_api import CompositeVideo
 
 
 @dataclass
@@ -39,6 +40,13 @@ class Analysis:
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
         result_filename = self.result_path.joinpath("Result.csv")
         serializer.encode(self.results, result_filename)
+        return self
+
+    def export_video(self) -> Analysis:
+        video = CompositeVideo()
+        video.index_videos(self.video_path)
+        result_filename = self.result_path.joinpath("Composite.mp4")
+        video.export(result_filename)
         return self
 
     def clear_data(self) -> Analysis:
