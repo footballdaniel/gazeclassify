@@ -2,7 +2,7 @@ import glob
 import os
 from dataclasses import dataclass
 from pathlib import Path
-
+import shutil
 
 @dataclass
 class Deleter:
@@ -12,4 +12,5 @@ class Deleter:
             os.remove(filepath)
 
     def clear_directory(self, directory_path: Path) -> None:
-        Path(directory_path).rmdir()
+        if Path(directory_path).exists():
+            shutil.rmtree(directory_path)

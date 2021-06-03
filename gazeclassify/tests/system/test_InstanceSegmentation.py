@@ -1,11 +1,11 @@
 from gazeclassify.classifier.instance import InstanceSegmentation
-from gazeclassify.eyetracker.pupilinvisible import PupilInvisibleLoader
+from gazeclassify.eyetracker.pupil import PupilLoader
 from gazeclassify.service.analysis import Analysis
 
 
 def test_run_instance_segmentation_on_two_frame_trial() -> None:
     analysis = Analysis()
-    PupilInvisibleLoader(analysis).from_trial_folder("gazeclassify/example_data/trial")
+    PupilLoader(analysis).from_trial_folder("gazeclassify/example_data/trial")
     InstanceSegmentation(analysis).classify("Human_Joints")
 
     import json

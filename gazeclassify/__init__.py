@@ -30,13 +30,13 @@ warnings.warn = warn
 
 from gazeclassify.classifier.instance import InstanceSegmentation
 from gazeclassify.classifier.semantic import SemanticSegmentation
-from gazeclassify.eyetracker.pupilinvisible import PupilInvisibleLoader
+from gazeclassify.eyetracker.pupil import PupilLoader
 from gazeclassify.service.analysis import Analysis
 
 __all__ = [
     'InstanceSegmentation',
     'SemanticSegmentation',
-    'PupilInvisibleLoader',
+    'PupilLoader',
     'Analysis',
     'example_trial'
 ]

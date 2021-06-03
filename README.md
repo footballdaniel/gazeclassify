@@ -24,13 +24,14 @@ Exported `csv` will contain distance from gaze (red circle) to human joints (lef
 | ...          	| ...             	| ...                   	| ...       	| ...        	|
 
 ### Run on example data
+
 ```python
-from gazeclassify import Analysis, PupilInvisibleLoader, SemanticSegmentation, InstanceSegmentation
+from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSegmentation
 from gazeclassify import example_trial
 
 analysis = Analysis()
 
-PupilInvisibleLoader(analysis).from_trial_folder(example_trial())
+PupilLoader(analysis).from_trial_folder(example_trial())
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
@@ -40,12 +41,13 @@ analysis.save_to_csv()
 
 ### Run on your own data
 Capture eye tracking data from a Pupil eye tracker. Then, [export the data](https://docs.pupil-labs.com/core/#_8-export-data) using Pupil software. You will get a folder with the exported world video and the gaze timestamps. Finally, let gazeclassify analyze the exported data:
+
 ```python
-from gazeclassify import Analysis, PupilInvisibleLoader, SemanticSegmentation, InstanceSegmentation
+from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSegmentation
 
 analysis = Analysis()
 
-PupilInvisibleLoader(analysis).from_trial_folder("path/to/your/folder_with_exported_data/")
+PupilLoader(analysis).from_trial_folder("path/to/your/folder_with_exported_data/")
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")

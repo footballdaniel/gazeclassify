@@ -169,7 +169,7 @@ class PupilDataLoader:
 
 
 @dataclass
-class PupilInvisibleLoader:
+class PupilLoader:
     analysis: Analysis
 
     def from_trial_folder(self, path: str) -> None:

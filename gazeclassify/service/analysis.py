@@ -26,6 +26,9 @@ class Analysis:
     results: List[FrameResult] = field(default_factory=list)
     dataset: Dataset = NullDataset()
 
+    def __post_init__(self) -> None:
+        self.clear_data()
+
     def save_to_json(self) -> Analysis:
         logging.info(f"Writing results to: {str(self.result_path)}")
         serializer = JsonSerializer()

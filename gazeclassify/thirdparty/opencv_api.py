@@ -63,6 +63,10 @@ class OpenCVClassifier:
                       [18, 18]]
         keypointsMapping = self._get_keypoints_mapping()
         results = []
+
+        self.pixel_x = record.gaze.x * self._frame_width
+        self.pixel_y = self._frame_height - (record.gaze.y * self._frame_height)  # flip vertically
+
         for i in range(17):
             for n in range(len(self.personwise_keypoints)):
                 index = self.personwise_keypoints[n][np.array(POSE_PAIRS[i])]
@@ -73,12 +77,10 @@ class OpenCVClassifier:
                 point_x = B[0]
                 point_y = A[0]
 
-                self.pixel_x = record.gaze.x * self._frame_width
-                self.pixel_y = self._frame_height - (record.gaze.y * self._frame_height)  # flip vertically
-
                 distance = DistanceToPoint(point_x, point_y).distance_2d(self.pixel_x, self.pixel_y)
                 classification = InstanceClassification(distance, keypointsMapping[i], n)
                 results.append(classification)
+
         return results  # type: ignore
 
     def classify_frame(self, frame: np.ndarray, threshold: float = 0.1) -> np.ndarray:
