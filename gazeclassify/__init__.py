@@ -1,14 +1,16 @@
 import logging
 import pkg_resources
 
-from typing import Union
+from typing import Union, Any
+
+
 def set_logger(level: Union[int, str]) -> None:
     logging.basicConfig(level=level, format='%(levelname)s: %(message)s (%(module)s)')
 
 set_logger("INFO")
 
 # Explicit reexport for mypy
-def example_trial() -> str:
+def example_trial() -> Any:
     trial_filepath = pkg_resources.resource_filename('gazeclassify', 'example_data/trial')
     return trial_filepath
 

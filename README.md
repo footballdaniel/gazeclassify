@@ -12,8 +12,7 @@ Special thanks to [Pixellib](https://pixellib.readthedocs.io/en/latest/) for pro
 ### What is GazeClassify?
  GazeClassify provides automatized and standardized eye-tracking annotation. Anyone can analyze gaze data online with less than 10 lines of code. 
 
-![Result_image](gazeclassify/example_data/result_composite.jpg)
-
+![](https://raw.githubusercontent.com/footballdaniel/gazeclassify/main/gazeclassify/example_data/result_composite.jpg)
 Exported `csv` will contain distance from gaze (red circle) to human joints (left image) and human shapes (right image) for each frame.
 
 | frame number 	| classifier name 	| gaze_distance [pixel] 	| person_id 	| joint name 	|
@@ -56,7 +55,7 @@ analysis.save_to_csv()
 ```
 
 ### Citation
-Please [cite this paper](https://dl.acm.org/doi/10.1145/3450341.3458886) in your publications if GazeClassify helps your research.
+Please [cite this paper](https://dl.acm.org/doi/10.1145/3450341.3458886) in your publications if [GazeClassify](https://www.growkudos.com/publications/10.1145%25252F3450341.3458886/reader) helps your research. 
 
 ```
 @inproceedings{10.1145/3450341.3458886,

@@ -97,7 +97,11 @@ class OpenCVClassifier:
         return ScatterImage(image).scatter(self.pixel_x, self.pixel_y)
 
     def is_gpu_available(self) -> None:
-        self.net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
+        try:
+            self.net = cv2.dnn.readNetFromCaffe(str(self.model_prototype.file_path), str(self.model_weights.file_path))
+        except:
+            logging.warning(
+                f"Model was not downloaded completely. Please delete the model files: {self.model_prototype.file_path}")
         cuda_devices = self._cuda_ready_devices()
         if cuda_devices > 0:
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)

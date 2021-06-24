@@ -1,22 +1,24 @@
-from typing import List
+from typing import List, Tuple, Optional
 import csv
 import os.path
+
 
 class CsvLoader:
     ''' A class used to extract gaze data from csv files.'''
 
-    def __init__(self, folderpath: str): 
+    def __init__(self, folderpath: str):
         '''The input of the __init__ function of this class should be the path to the folder containing data.
         Input should look like : "C:/Desk/CsvFiles".'''
         self.folderpath = folderpath
 
-    def check_if_file_exists(self, filename: str = "timestamps.csv"):
+    def check_if_file_exists(self, filename: str = "timestamps.csv") -> None:
         ''' This function is used in others to check if the file containing data exists. 
         Input should look like "filename.csv".'''
         self.filename = filename
         os.path.exists(self.folderpath + "/" + self.filename)
 
-    def read_timestamps(self, filename: str = "timestamps.csv", column_name: str = "timestamps")-> List[float]:
+    def read_timestamps(self, filename: str = "timestamps.csv", column_name: str = "timestamps") -> Optional[
+        List[float]]:
         ''' This function is used to extract timestamps.
         filename should be the name of the file containing timestamps.
         column_name corresponds to the name of the column in which those timestamps are.'''
@@ -32,8 +34,10 @@ class CsvLoader:
             return self.timestamps
         else:
             print("File does not have the right columns")
+            return []
 
-    def read_position(self, filename: str = "gaze_positions.csv", column_name_x: str = "norm_pos_x", column_name_y: str = "norm_pos_y")-> List[float]:
+    def read_position(self, filename: str = "gaze_positions.csv", column_name_x: str = "norm_pos_x",
+                      column_name_y: str = "norm_pos_y") -> Tuple[List[float], List[float]]:
         ''' This function is used to extract the gaze positions along the X and Y axis.
         filename should be the path to the file containing the gaze positions data. 
         column_name_x corresponds to the name of the column in which the gaze position along the x axis is. 

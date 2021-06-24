@@ -15,7 +15,9 @@ setuptools.setup(
         'opencv-python>=4.1.2',
         'pixellib>=0.6.1',
         'tqdm>=4.60.0',
-        'moviepy>=1.0.3'
+        'moviepy>=1.0.3',
+        'tabulate>=0.8.9',
+        'pandas>=1.2.5'
     ],
     tests_require=['pytest'],
     long_description=readme,

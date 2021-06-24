@@ -10,3 +10,5 @@ gazeclassify~=0.5
 matplotlib~=3.3.4
 setuptools~=57.0.0
 moviepy~=1.0.3
+tabulate=0.8.9
+pandas>=1.2.5

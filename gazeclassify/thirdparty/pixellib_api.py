@@ -29,10 +29,14 @@ class PixellibTensorflowClassifier:
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
         self._get_frame_size(frame)
         segmask, output = self.segment_image.segmentFrame(frame, segment_target_classes=self.target_classes)
-        self._extract_people_mask(segmask)
-        self.boolean_mask = np.any(segmask["masks"], axis=-1)
+        self._create_boolean_mask(segmask)
         classified_frame = self._mask_to_rgb()
         return classified_frame
+
+    def _create_boolean_mask(self, segmask: Dict[str, Any]) -> None:
+        if len(segmask["masks"]) == 0:
+            segmask["masks"] = np.zeros((self.image_height, self.image_width, 1), dtype=bool)
+        self.boolean_mask = np.any(segmask["masks"], axis=-1)
 
     def is_gpu_available(self) -> None:
         list_gpu = tf.config.list_physical_devices('GPU')
@@ -83,5 +87,5 @@ class ScatterImage:
         red = (0, 0, 255)  # BGR
         radius = math.ceil(self.image.shape[0] / 100)
         filled = -1
-        image = cv2.circle(self.image, (int(x), int(y)), radius=radius, color=red, thickness=filled)
-        return image
+        self.image = cv2.circle(self.image, (int(x), int(y)), radius=radius, color=red, thickness=filled)
+        return self.image
