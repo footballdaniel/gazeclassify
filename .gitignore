@@ -5,6 +5,7 @@
 image*.jpg
 venvpixellib/
 .idea/
+/experiment/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

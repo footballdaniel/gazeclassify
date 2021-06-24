@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any
 
 from matplotlib.figure import Figure  # type: ignore
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt  # type: ignore
 import numpy as np  # type: ignore
 
 
-class ResultAnalysis:
+class Results:
     ''' A class used to analyze results obtained with the GazeClassify package.'''
 
     def __init__(self, filepath: str) -> None:
@@ -44,7 +45,7 @@ class ResultAnalysis:
         self.tablename = (tabulate(self.Results, self.Head, tablefmt="github", floatfmt=(".2f")))
         return self.tablename
 
-    def piechart(self) -> Figure:
+    def piechart(self) -> Results:
         ''' This function produces pie chart corresponding to the "results" obtained with the __init__ function.
         This function requires running the __init__ function first.'''
         self.fig = plt.figure()
@@ -54,9 +55,9 @@ class ResultAnalysis:
                    bbox_transform=plt.gcf().transFigure)
         plt.title("Pourcentages of frames for each joint where it was the closest to gaze")
         plt.show()
-        return self.fig
+        return self
 
-    def barplot(self) -> Figure:
+    def barplot(self) -> Results:
         ''' This function produces a barplot corresponding to the "results" obtained with the __init__ function.
         This function requires running the __init__ function first.'''
         plt.rcdefaults()
@@ -69,9 +70,9 @@ class ResultAnalysis:
         self.ax.set_xlabel('Percentages')
         self.ax.set_title('Closest joint from gaze')
         plt.show()
-        return self.fig
+        return self
 
-    def timeseries_human_shape(self) -> Figure:
+    def timeseries_human_shape(self) -> Results:
         ''' This function represents the evolution between frames of the distance between the location of gaze and human shape.
         This function requires running the __init__ function first.'''
         self.dfHS = self.dataframe[self.dataframe['name'] == 'Human_Shape']
@@ -82,9 +83,9 @@ class ResultAnalysis:
         plt.ylabel("Distance between gaze and human shape")
         self.axHS.plot(self.dfHS.frame, self.dfHS.distance, color="blue")
         plt.show()
-        return self.fig
+        return self
 
-    def piechart_human_shape(self) -> Figure:
+    def piechart_human_shape(self) -> Results:
         ''' This function produces a pie chart corresponding to the pourcentages of frames where the gaze is located on or outside of human shape.
         This function requires running the __init__ function first.'''
         self.dfHS = self.dataframe[self.dataframe['name'] == 'Human_Shape']
@@ -98,11 +99,11 @@ class ResultAnalysis:
         self.gaze_shape = plt.pie(self.Shape_pie_rounded, labels=self.Shape_pie_rounded)
         plt.legend(self.gaze_shape[0], self.Shape_label, bbox_to_anchor=(1.15, 0.5), loc="center right", fontsize=10,
                    bbox_transform=plt.gcf().transFigure)
-        plt.title("Pourcentages of frames where the gaze is located on or outside of human shape")
+        plt.title("Gaze distribution on human shape")
         plt.show()
-        return self.fig
+        return self
 
-    def timeseries_plot(self, joint: str) -> Figure:
+    def timeseries_plot(self, joint: str) -> Results:
         ''' This function represents the evolution between frames of the distance between the location of gaze and the chosen joint with input.
         Possible inputs are these strings : "Left Ankle" ; "Right Ankle" ; "Left Elbow" ; "Right Elbow" ; "Neck" ; "Left Ear" ; "Right Ear" ; "Left Knee" ; "Right Knee" ; "Left Shoulder" ; "Right Shoulder" ; "Left Eye" ; "Right Eye" ; "Left Hip" ; "Right Hip" ; "Left Wrist" ; "Right Wrist". '''
         self.joint = joint
@@ -113,8 +114,12 @@ class ResultAnalysis:
         plt.title("Evolution of the distance between the gaze and the " + self.joint)
         plt.xlabel("Frame")
         plt.ylabel("Distance");
-        return self.fig
+        return self
 
-    def save(self, filename: str) -> None:
+    def show(self) -> None:
+        plt.show()
+
+    def save(self, filename: str) -> Results:
         self.filename = filename
-        self.fig.save(filename + ".png")
+        self.fig.savefig(filename)
+        return self

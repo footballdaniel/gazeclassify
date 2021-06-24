@@ -173,10 +173,12 @@ class PupilLoader:
     analysis: Analysis
 
     def from_trial_folder(self, path: str) -> None:
+        trial_path = Path(path)
         file_repository = PupilInvisibleRepository(path)
         gaze_data = file_repository.load_gaze_data()
         video_metadata = file_repository.load_video_metadata()
         serializer = PupilInvisibleSerializer()
+        self.analysis.trial_name = trial_path.stem
         self.analysis.dataset = serializer.deserialize(gaze_data, video_metadata)
 
 
