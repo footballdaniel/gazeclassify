@@ -28,15 +28,15 @@ class PixellibTensorflowClassifier:
 
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
         self._get_frame_size(frame)
-        segmask, output = self.segment_image.segmentFrame(frame, segment_target_classes=self.target_classes)
-        self._create_boolean_mask(segmask)
+        segmentation_mask, output = self.segment_image.segmentFrame(frame, segment_target_classes=self.target_classes)
+        self._create_boolean_mask(segmentation_mask)
         classified_frame = self._mask_to_rgb()
         return classified_frame
 
-    def _create_boolean_mask(self, segmask: Dict[str, Any]) -> None:
-        if len(segmask["masks"]) == 0:
-            segmask["masks"] = np.zeros((self.image_height, self.image_width, 1), dtype=bool)
-        self.boolean_mask = np.any(segmask["masks"], axis=-1)
+    def _create_boolean_mask(self, segmentation_mask: Dict[str, Any]) -> None:
+        if len(segmentation_mask["masks"]) == 0:
+            segmentation_mask["masks"] = np.zeros((self.image_height, self.image_width, 1), dtype=bool)
+        self.boolean_mask = np.any(segmentation_mask["masks"], axis=-1)
 
     def is_gpu_available(self) -> None:
         list_gpu = tf.config.list_physical_devices('GPU')
@@ -54,12 +54,12 @@ class PixellibTensorflowClassifier:
         rgb_out = np.dstack([int_concat] * 3)
         return rgb_out
 
-    def _extract_people_mask(self, segmask: Dict[str, Any]) -> None:
+    def _extract_people_mask(self, segmentation_mask: Dict[str, Any]) -> None:
         people_masks = []
         person_class_id = 1
-        for index in range(segmask["masks"].shape[-1]):
-            if segmask['class_ids'][index] == person_class_id:
-                people_masks.append(segmask["masks"][:, :, index])
+        for index in range(segmentation_mask["masks"].shape[-1]):
+            if segmentation_mask['class_ids'][index] == person_class_id:
+                people_masks.append(segmentation_mask["masks"][:, :, index])
 
     def gaze_distance_to_object(self, record: DataRecord) -> Optional[float]:
         binary_image_mask = self.boolean_mask.astype('uint8')
@@ -70,9 +70,9 @@ class PixellibTensorflowClassifier:
         distance = pixel_distance.distance_2d(self.pixel_x, self.pixel_y)
         return distance
 
-    def set_target(self) -> None:
+    def set_target(self, minimal_confidence: float = 0.7) -> None:
         self.segment_image = instance_segmentation(infer_speed=InferSpeed.AVERAGE.value)
-        self.segment_image.load_model(self.model_weights.file_path)
+        self.segment_image.load_model(self.model_weights.file_path, minimal_confidence)
         self.target_classes = self.segment_image.select_target_classes(person=True)
 
     def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:

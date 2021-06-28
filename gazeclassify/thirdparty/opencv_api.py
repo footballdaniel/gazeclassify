@@ -83,11 +83,11 @@ class OpenCVClassifier:
 
         return results  # type: ignore
 
-    def classify_frame(self, frame: np.ndarray, threshold: float = 0.1) -> np.ndarray:
+    def classify_frame(self, frame: np.ndarray, minimal_threshold: float = 0.1) -> np.ndarray:
         self._frame_width = frame.shape[1]
         self._frame_height = frame.shape[0]
         classified_image = self._classify_with_dnn(frame)
-        self._detect_keypoints(classified_image, threshold)
+        self._detect_keypoints(classified_image, minimal_threshold)
         self._get_valid_keypoint_pairs(classified_image)
         self._get_personwise_keypoints()
         visualized_frame = self._visualize(frame)

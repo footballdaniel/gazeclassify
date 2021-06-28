@@ -42,7 +42,7 @@ class InstanceSegmentation(Algorithm):
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
 
-            frameClone = classifier.classify_frame(frame)
+            frameClone = classifier.classify_frame(frame, self.minimal_confidence)
             results = classifier.gaze_distance_to_instance(record)
             frameClone = classifier.visualize_gaze_overlay(frameClone)
             frame_results = FrameResult(idx, classifier_name, results)

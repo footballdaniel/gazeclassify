@@ -28,14 +28,14 @@ class SemanticSegmentation(Algorithm):
     def analysis(self) -> Analysis:
         return self._analysis
 
-    def classify(self, classifier_name: str) -> None:
+    def classify(self, classifier_name: str, minimal_confidence: float = 0.7) -> None:
         writer = self._setup_video_writer(classifier_name)
         reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
         model = self._download_model()
 
         classifier = PixellibTensorflowClassifier(model)
         classifier.is_gpu_available()
-        classifier.set_target()
+        classifier.set_target(minimal_confidence)
 
         for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Semantic segmentation")):
             frame = reader.next_frame()
