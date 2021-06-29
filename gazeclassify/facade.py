@@ -10,6 +10,6 @@ InstanceSegmentation(analysis).classify("Human_Joints")
 analysis.save_to_csv()
 analysis.export_video()
 
-analysis.pieplot("pieplot.png")
+analysis.pieplot("../pieplot.png")
 
 

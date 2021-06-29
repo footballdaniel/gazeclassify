@@ -13,12 +13,23 @@ setuptools.setup(
         'tensorflow>=2.4.1',
         'ffmpeg-python>=0.2.0',
         'opencv-python>=4.1.2',
-        'pixellib>=0.6.1',
+        'pixellib>=0.6.6',
         'tqdm>=4.60.0',
         'moviepy>=1.0.3',
         'tabulate>=0.8.9',
         'pandas>=1.2.5'
     ],
+    extras_require={
+        'cuda_cv2_dev': [
+            'tensorflow>=2.4.1',
+            'ffmpeg-python>=0.2.0',
+            'pixellib>=0.6.6',
+            'tqdm>=4.60.0',
+            'moviepy>=1.0.3',
+            'tabulate>=0.8.9',
+            'pandas>=1.2.5'
+        ]
+    },
     tests_require=['pytest'],
     long_description=readme,
     long_description_content_type="text/markdown",

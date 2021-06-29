@@ -4,7 +4,7 @@ from gazeclassify.service.analysis import Analysis
 
 
 class Algorithm(ABC):
-    _minimal_confidence: float = 0.5
+    _minimal_confidence: float = 0.1
 
     @property
     def minimal_confidence(self) -> float:

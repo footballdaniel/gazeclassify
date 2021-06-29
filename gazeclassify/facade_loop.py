@@ -1,6 +1,6 @@
 import os
 
-from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSegmentation, example_trial
+from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSegmentation
 
 experimental_folder = "experiment"
 trials = [f.path for f in os.scandir(experimental_folder) if f.is_dir()]
