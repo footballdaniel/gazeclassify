@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 
 from matplotlib.figure import Figure  # type: ignore
-from tabulate import tabulate
+from tabulate import tabulate  # type: ignore
 import pandas as pd  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import numpy as np  # type: ignore
