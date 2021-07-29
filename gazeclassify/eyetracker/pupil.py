@@ -179,7 +179,7 @@ class PupilLoader:
         video_metadata = file_repository.load_video_metadata()
         serializer = PupilInvisibleSerializer()
         self.analysis.trial_name = trial_path.stem
-        self.analysis.dataset = serializer.deserialize(gaze_data, video_metadata)
+        self.analysis.recording = serializer.deserialize(gaze_data, video_metadata)
 
 
 @dataclass

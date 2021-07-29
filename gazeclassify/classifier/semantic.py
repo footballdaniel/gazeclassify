@@ -15,6 +15,53 @@ from gazeclassify.thirdparty.pixellib_api import PixellibTensorflowClassifier
 
 
 @dataclass
+class CustomSegmentation(Algorithm):
+    _analysis: Analysis
+    _model: str
+
+    @property
+    def analysis(self) -> Analysis:
+        return self._analysis
+
+    def classify(self, classifier_name: str, minimal_confidence: float = 0.7) -> None:
+        writer = self._setup_video_writer(classifier_name)
+        reader = self._setup_video_reader(self.analysis.recording.world_video.file)
+
+        classifier = PixellibTensorflowClassifier(self._model)
+        classifier.is_gpu_available()
+        classifier.set_target(minimal_confidence)
+
+        for idx, record in enumerate(tqdm(self.analysis.recording.records, desc="Custom segmentation")):
+            frame = reader.next_frame()
+            if not reader.has_frame:
+                logging.error("Video has ended prematurely")
+            frame = classifier.classify_frame(frame)
+            result = classifier.gaze_distance_to_object(record)
+            frame = classifier.visualize_gaze_overlay(frame)
+            writer.write(frame)
+            results = Classification(result)
+            frame_result = FrameResult(idx, classifier_name, [results])
+            self.analysis.results.append(frame_result)
+
+        writer.release()
+        reader.release()
+        cv2.destroyAllWindows()
+
+    def _setup_video_reader(self, file: Path) -> VideoReader:
+        reader = OpenCVReader(file)
+        reader.initiate()
+        return reader
+
+    def _setup_video_writer(self, classifier_name: str) -> VideoWriter:
+        Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
+        video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.avi")
+        writer = OpenCVWriter(video_target)
+        world_video = self.analysis.recording.world_video
+        writer.initiate(world_video.width, world_video.height)
+        return writer
+
+
+@dataclass
 class SemanticSegmentation(Algorithm):
     """
     An implementation of the Mask-RCNN algorithm run with the tensorflow backend
@@ -30,14 +77,14 @@ class SemanticSegmentation(Algorithm):
 
     def classify(self, classifier_name: str, minimal_confidence: float = 0.7) -> None:
         writer = self._setup_video_writer(classifier_name)
-        reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
+        reader = self._setup_video_reader(self.analysis.recording.world_video.file)
         model = self._download_model()
 
         classifier = PixellibTensorflowClassifier(model)
         classifier.is_gpu_available()
         classifier.set_target(minimal_confidence)
 
-        for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Semantic segmentation")):
+        for idx, record in enumerate(tqdm(self.analysis.recording.records, desc="Semantic segmentation")):
             frame = reader.next_frame()
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
@@ -69,6 +116,6 @@ class SemanticSegmentation(Algorithm):
         Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
         video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.avi")
         writer = OpenCVWriter(video_target)
-        world_video = self.analysis.dataset.world_video
+        world_video = self.analysis.recording.world_video
         writer.initiate(world_video.width, world_video.height)
         return writer

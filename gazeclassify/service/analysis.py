@@ -26,7 +26,7 @@ class Analysis:
     model_path: Path = data_path.joinpath("models")
     result_path: Path = data_path.joinpath("results")
     results: List[FrameResult] = field(default_factory=list)
-    dataset: Dataset = NullDataset()
+    recording: Dataset = NullDataset()
 
     def __post_init__(self) -> None:
         self.clear_data()

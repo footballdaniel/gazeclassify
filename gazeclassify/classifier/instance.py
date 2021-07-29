@@ -30,14 +30,14 @@ class InstanceSegmentation(Algorithm):
 
     def classify(self, classifier_name: str) -> None:
         writer = self._setup_video_writer(classifier_name)
-        reader = self._setup_video_reader(self.analysis.dataset.world_video.file)
+        reader = self._setup_video_reader(self.analysis.recording.world_video.file)
         model_weights = self._download_model_weights()
         model_prototype = self._download_model_prototype()
 
         classifier = OpenCVClassifier(model_weights, model_prototype)
         classifier.is_gpu_available()
 
-        for idx, record in enumerate(tqdm(self.analysis.dataset.records, desc="Instance segmentation")):
+        for idx, record in enumerate(tqdm(self.analysis.recording.records, desc="Instance segmentation")):
             frame = reader.next_frame()
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
@@ -62,7 +62,7 @@ class InstanceSegmentation(Algorithm):
         Path.mkdir(self.analysis.video_path, parents=True, exist_ok=True)
         video_target = Path(self.analysis.video_path).joinpath(f"{classifier_name}.avi")
         writer = OpenCVWriter(video_target)
-        world_video = self.analysis.dataset.world_video
+        world_video = self.analysis.recording.world_video
         writer.initiate(world_video.width, world_video.height)
         return writer
 
