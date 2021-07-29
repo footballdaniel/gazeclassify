@@ -8,7 +8,7 @@ trials = [f.path for f in os.scandir(experimental_folder) if f.is_dir()]
 for trial in trials:
     analysis = Analysis()
 
-    PupilLoader(analysis).from_trial_folder(trial)
+    PupilLoader(analysis).from_recordings_folder(trial)
 
     SemanticSegmentation(analysis).classify("Human_Shape")
     InstanceSegmentation(analysis).classify("Human_Joints")

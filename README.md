@@ -30,7 +30,7 @@ from gazeclassify import example_trial
 
 analysis = Analysis()
 
-PupilLoader(analysis).from_trial_folder(example_trial())
+PupilLoader(analysis).from_recordings_folder(example_trial())
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
@@ -46,7 +46,7 @@ from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSe
 
 analysis = Analysis()
 
-PupilLoader(analysis).from_trial_folder("path/to/your/folder_with_exported_data/")
+PupilLoader(analysis).from_recordings_folder("path/to/your/folder_with_exported_data/")
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")

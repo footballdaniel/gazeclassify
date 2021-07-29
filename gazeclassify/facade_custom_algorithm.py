@@ -3,9 +3,9 @@ from gazeclassify.classifier.semantic import CustomSegmentation
 
 analysis = Analysis()
 
-PupilLoader(analysis).from_trial_folder(example_trial())
+PupilLoader(analysis).from_recordings_folder(example_trial())
 
-CustomSegmentation(analysis, "example_data/micro.h5").classify("Microphone")
+CustomSegmentation(analysis, "example_data/trampoline.h5").classify("Trampoline")
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
 

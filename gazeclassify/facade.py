@@ -2,7 +2,7 @@ from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSe
 
 analysis = Analysis()
 
-PupilLoader(analysis).from_trial_folder(example_trial())
+PupilLoader(analysis).from_recordings_folder(example_trial())
 
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")

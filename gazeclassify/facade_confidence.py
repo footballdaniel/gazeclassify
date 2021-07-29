@@ -2,7 +2,7 @@ from gazeclassify import Analysis, PupilLoader, SemanticSegmentation, InstanceSe
 
 analysis = Analysis()
 
-PupilLoader(analysis).from_trial_folder(example_trial())
+PupilLoader(analysis).from_recordings_folder(example_trial())
 
 semantic = SemanticSegmentation(analysis)
 semantic.minimal_confidence = 0.7

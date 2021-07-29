@@ -5,7 +5,7 @@ from gazeclassify.service.analysis import Analysis
 
 def test_run_semantic_segmentation_on_two_frame_trial() -> None:
     analysis = Analysis()
-    PupilLoader(analysis).from_trial_folder("gazeclassify/example_data/trial")
+    PupilLoader(analysis).from_recordings_folder("gazeclassify/example_data/trial")
     SemanticSegmentation(analysis).classify("Human_Shape")
 
     import json

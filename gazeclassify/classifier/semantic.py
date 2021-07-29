@@ -29,7 +29,6 @@ class CustomSegmentation(Algorithm):
 
         classifier = PixellibCustomTensorflowClassifier(self._model, classifier_name)
         classifier.is_gpu_available()
-        classifier.set_target(minimal_confidence)
 
         for idx, record in enumerate(tqdm(self.analysis.recording.records, desc="Custom segmentation")):
             frame = reader.next_frame()

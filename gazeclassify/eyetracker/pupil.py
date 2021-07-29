@@ -70,6 +70,11 @@ class PupilDataLoader:
         gaze_stream = open(full_filename, 'rb')
         return gaze_stream
 
+    def _get_gaze_positions_filepath(self, path: str) -> Path:
+        folder = Path(path)
+        full_filename = Path.joinpath(folder, "gaze_positions.csv")
+        return full_filename
+
     def access_world_timestamps(self, path: str) -> BinaryIO:
         full_filename = self._get_world_timestamps_filepath(path)
         timestamps_stream = open(full_filename, 'rb')
@@ -162,17 +167,12 @@ class PupilDataLoader:
             self._gaze_timestamps.append(float(row[0]))
             self.line_count += 1
 
-    def _get_gaze_positions_filepath(self, path: str) -> Path:
-        folder = Path(path)
-        full_filename = Path.joinpath(folder, "gaze_positions.csv")
-        return full_filename
-
 
 @dataclass
 class PupilLoader:
     analysis: Analysis
 
-    def from_trial_folder(self, path: str) -> None:
+    def from_recordings_folder(self, path: str) -> None:
         trial_path = Path(path)
         file_repository = PupilInvisibleRepository(path)
         gaze_data = file_repository.load_gaze_data()
