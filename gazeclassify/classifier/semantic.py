@@ -11,7 +11,7 @@ from gazeclassify.service.analysis import Analysis
 from gazeclassify.service.model_loader import ModelLoader
 from gazeclassify.domain.results import Classification, FrameResult
 from gazeclassify.thirdparty.opencv_api import OpenCVReader, OpenCVWriter
-from gazeclassify.thirdparty.pixellib_api import PixellibTensorflowClassifier
+from gazeclassify.thirdparty.pixellib_api import PixellibTensorflowClassifier, PixellibCustomTensorflowClassifier
 
 
 @dataclass
@@ -27,7 +27,7 @@ class CustomSegmentation(Algorithm):
         writer = self._setup_video_writer(classifier_name)
         reader = self._setup_video_reader(self.analysis.recording.world_video.file)
 
-        classifier = PixellibTensorflowClassifier(self._model)
+        classifier = PixellibCustomTensorflowClassifier(self._model, classifier_name)
         classifier.is_gpu_available()
         classifier.set_target(minimal_confidence)
 
