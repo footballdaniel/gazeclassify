@@ -83,7 +83,7 @@ class OpenCVClassifier:
 
         return results  # type: ignore
 
-    def classify_frame(self, frame: np.ndarray, minimal_threshold: float = 0.1) -> np.ndarray:
+    def classify_frame(self, frame: np.ndarray, minimal_threshold: float) -> np.ndarray:
         self._frame_width = frame.shape[1]
         self._frame_height = frame.shape[0]
         classified_image = self._classify_with_dnn(frame)

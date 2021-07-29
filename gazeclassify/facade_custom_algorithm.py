@@ -5,7 +5,7 @@ analysis = Analysis()
 
 PupilLoader(analysis).from_trial_folder(example_trial())
 
-CustomSegmentation(analysis,)
+CustomSegmentation(analysis, "example_data/micro.h5").classify("Microphone")
 SemanticSegmentation(analysis).classify("Human_Shape")
 InstanceSegmentation(analysis).classify("Human_Joints")
 
