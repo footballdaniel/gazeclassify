@@ -28,12 +28,7 @@ class PixellibCustomTensorflowClassifier:
 
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
         self._get_frame_size(frame)
-
-        segment_image = custom_segmentation()
-        segment_image.inferConfig(num_classes=1, class_names=["BG", self.classifier_name])
-        segment_image.load_model(self.model_weights)
-        segmentation_mask, output = segment_image.segmentFrame(frame, show_bboxes=False)
-
+        segmentation_mask, output = self.segment_image.segmentFrame(frame, show_bboxes=False)
         self._create_boolean_mask(segmentation_mask)
         classified_frame = self._mask_to_rgb()
         return classified_frame
@@ -76,7 +71,9 @@ class PixellibCustomTensorflowClassifier:
         return distance
 
     def set_target(self, minimal_confidence: float = 0.7) -> None:
-        raise NotImplementedError
+        self.segment_image = custom_segmentation()
+        self.segment_image.inferConfig(num_classes=1, class_names=["BG", self.classifier_name])
+        self.segment_image.load_model(self.model_weights)
 
     def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:
         return ScatterImage(image).scatter(self.pixel_x, self.pixel_y)

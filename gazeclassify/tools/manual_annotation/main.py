@@ -4,7 +4,7 @@ import pandas as pd  # type: ignore
 import streamlit as st  # type: ignore
 import cv2  # type: ignore
 
-from utils import download_link
+from utils import download_link  # type: ignore
 
 AOI = (
     "Other",
