@@ -1,4 +1,4 @@
-tensorflow==2.5.0
+tensorflow==2.5.1
 pixellib==0.6.6
 ffmpeg-python>=0.2.0
 numpy>=1.19.5
