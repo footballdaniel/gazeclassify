@@ -55,8 +55,8 @@ class CSVSerializer:
                     dict["distance"] = str(int(classification.distance))  # type: ignore
                 try:
                     instance = cast(InstanceClassification, classification)
-                    dict["person_id"] = str(instance.person_id)
-                    dict["joint"] = instance.joint
+                    dict["person_id"] = str(instance.id)
+                    dict["joint"] = instance.name
                 except:
                     pass
                 self._dict_data.append(dict)

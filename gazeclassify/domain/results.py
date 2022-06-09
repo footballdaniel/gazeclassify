@@ -6,11 +6,10 @@ from typing import List, Optional
 class Classification:
     distance: Optional[float]
 
-
 @dataclass
 class InstanceClassification(Classification):
-    joint: str
-    person_id: int
+    name: str
+    id: int
 
 
 @dataclass

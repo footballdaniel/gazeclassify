@@ -36,11 +36,10 @@ class CustomSegmentation(Algorithm):
             if not reader.has_frame:
                 logging.error("Video has ended prematurely")
             frame = classifier.classify_frame(frame)
-            result = classifier.gaze_distance_to_object(record)
+            classifications = classifier.gaze_distance_to_object(record)
             frame = classifier.visualize_gaze_overlay(frame)
             writer.write(frame)
-            results = Classification(result)
-            frame_result = FrameResult(idx, classifier_name, [results])
+            frame_result = FrameResult(idx, classifier_name, classifications)
             self.analysis.results.append(frame_result)
 
         writer.release()
