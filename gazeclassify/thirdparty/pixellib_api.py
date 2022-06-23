@@ -22,10 +22,12 @@ class InferSpeed(Enum):
     FAST = "fast"
     AVERAGE = "average"
 
+
 @dataclass
 class Mask:
     name: str
     mask: np.ndarray
+
 
 @dataclass
 class PixellibCustomTensorflowClassifier:
@@ -34,15 +36,20 @@ class PixellibCustomTensorflowClassifier:
     _all_trained_classes = list[str]
     _boolean_masks: list[Mask] = field(default_factory=list)
 
+    def set_target(self, minimal_confidence: float = 0.7) -> None:
+        self.segment_image = custom_segmentation()
+        self._all_trained_classes, number_classes = self._get_config()
+        self.segment_image.inferConfig(num_classes=number_classes, class_names=self._all_trained_classes)
+        self.segment_image.load_model(self.model_weights)
+
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
         self._get_frame_size(frame)
-        segmentation_mask, _ = self.segment_image.segmentFrame(frame, show_bboxes=False)
-
+        segmentation_mask, _image = self.segment_image.segmentFrame(frame, show_bboxes=True)
         boolean_mask = np.zeros((self.image_height, self.image_width), dtype=bool)
 
         for index, instance in enumerate(segmentation_mask["class_ids"]):
             class_name = self._all_trained_classes[instance]
-            class_mask = segmentation_mask["masks"][:,:,index]
+            class_mask = segmentation_mask["masks"][:, :, index]
             # np.any(class_mask, axis=-1) # needed?
             mask = Mask(class_name, class_mask)
             self._boolean_masks.append(mask)
@@ -67,12 +74,6 @@ class PixellibCustomTensorflowClassifier:
             classifications.append(classification)
 
         return classifications
-    
-    def set_target(self, minimal_confidence: float = 0.7) -> None:
-        self.segment_image = custom_segmentation()
-        self._all_trained_classes, number_classes = self._get_config()
-        self.segment_image.inferConfig(num_classes=number_classes, class_names=self._all_trained_classes)
-        self.segment_image.load_model(self.model_weights)
 
     def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:
         return ScatterImage(image).scatter(self.pixel_x, self.pixel_y)
@@ -83,6 +84,16 @@ class PixellibCustomTensorflowClassifier:
             logging.info("CUDA not available on GPU, falling back on slower CPU for semantic segmentation")
         else:
             logging.info("Using GPU for instance segmentation")
+
+    def _get_config(self):
+        if isinstance(self.classifier_name, list):
+            all_trained_classes = self.classifier_name.copy()
+            all_trained_classes.insert(0, "BG")
+            number_classes = len(self.classifier_name)
+        else:
+            all_trained_classes = ["BG", self.classifier_name]
+            number_classes = 1
+        return all_trained_classes, number_classes
 
     def _create_boolean_mask(self, segmentation_mask: Dict[str, Any]) -> None:
         if len(segmentation_mask["masks"]) == 0:
@@ -105,15 +116,7 @@ class PixellibCustomTensorflowClassifier:
             if segmentation_mask['class_ids'][index] == person_class_id:
                 people_masks.append(segmentation_mask["masks"][:, :, index])
 
-    def _get_config(self):
-        if isinstance(self.classifier_name, list):
-            all_trained_classes = self.classifier_name.copy()
-            all_trained_classes.insert(0, "BG")
-            number_classes = len(self.classifier_name)
-        else:
-            all_trained_classes = ["BG", self.classifier_name]
-            number_classes = 1
-        return all_trained_classes,number_classes
+
 
 
 @dataclass

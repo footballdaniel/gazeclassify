@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import cv2  # type: ignore
 from tqdm import tqdm  # type: ignore
@@ -23,7 +24,7 @@ class CustomSegmentation(Algorithm):
     def analysis(self) -> Analysis:
         return self._analysis
 
-    def classify(self, classifier_name: str, minimal_confidence: float = 0.7) -> None:
+    def classify(self, classifier_name: str, minimal_confidence: float = 0.7, video_name: Optional[str] = None) -> None:
         writer = self._setup_video_writer(classifier_name)
         reader = self._setup_video_reader(self.analysis.recording.world_video.file)
 
