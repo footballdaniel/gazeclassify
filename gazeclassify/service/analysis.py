@@ -29,7 +29,7 @@ class Analysis:
     recording: Dataset = NullDataset()
 
     def __post_init__(self) -> None:
-        self.clear_data()
+        self.clear_files()
 
     def save_to_json(self) -> Analysis:
         logging.info(f"Writing results to: {str(self.result_path)}")
@@ -55,7 +55,7 @@ class Analysis:
         video.export(self._result_filename(".mp4"))
         return self
 
-    def clear_data(self) -> Analysis:
+    def clear_files(self) -> Analysis:
         Deleter().clear_directory(self.result_path)
         Deleter().clear_directory(self.video_path)
         return self

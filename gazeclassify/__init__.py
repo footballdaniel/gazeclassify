@@ -6,6 +6,7 @@ from gazeclassify.classifier.semantic import SemanticSegmentation
 from gazeclassify.eyetracker.pupil import PupilLoader
 from gazeclassify.service.analysis import Analysis
 import gazeclassify.utils.logging_format
+from gazeclassify.utils.find import Find
 
 __all__ = [
     'InstanceSegmentation',

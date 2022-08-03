@@ -1,20 +1,18 @@
-import os
+import logging
 
-from gazeclassify import Analysis, PupilLoader
+from gazeclassify import Analysis, PupilLoader, Find
 from gazeclassify.classifier.semantic import CustomSegmentation
 
-experimental_folder = "experiment"
-trials = [f.path for f in os.scandir(experimental_folder) if f.is_dir()]
+recordings_folder = "../../../data_link/participants/"
+model_file = "../../../data_link/models/mask_rcnn_model_all_AOIs.h5"
+results_folder = "../../../data_link/results/"
 
-for trial in trials:
+all_recordings = Find.recordings_in(recordings_folder, results_folder)
+
+for recording in all_recordings:
     analysis = Analysis()
+    PupilLoader(analysis).from_recordings_folder(recording)
+    CustomSegmentation(analysis, model_file).classify(["Mat", "Vault", "Trampoline", "Queue", "Jumper"])
+    analysis.save_to_csv(results_folder)
 
-    PupilLoader(analysis).from_recordings_folder(trial)
-
-    CustomSegmentation(analysis, "mask_rcnn_model.041-0.951009.h5").classify(["BG", "Mat", "Vault", "Trampoline", "Queue", "Jumper"])
-
-    analysis.save_to_csv(experimental_folder)
-    analysis.export_video(experimental_folder)
-
-
-
+logging.info("Done!")

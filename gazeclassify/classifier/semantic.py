@@ -40,12 +40,15 @@ class CustomSegmentation(Algorithm):
             classifications = classifier.gaze_distance_to_object(record)
             frame = classifier.visualize_gaze_overlay(frame)
             writer.write(frame)
-            frame_result = FrameResult(idx, self._model, self._sort_by_distance(classifications))
+            frame_result = FrameResult(idx, self._name_of(self._model), self._sort_by_distance(classifications))
             self.analysis.results.append(frame_result)
 
         writer.release()
         reader.release()
         cv2.destroyAllWindows()
+
+    def _name_of(self, path_to_model: str) -> str:
+        return Path(path_to_model).stem
 
     def _sort_by_distance(self, classifications):
         classifications = sorted(classifications, key=lambda x: x.distance)
