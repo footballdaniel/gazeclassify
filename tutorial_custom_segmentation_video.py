@@ -8,5 +8,5 @@ PupilLoader(analysis).from_recordings_folder(
 
 CustomSegmentation(analysis, "mask_rcnn_model.041-0.951009.h5").classify(
     ["Mat", "Vault", "Trampoline", "Queue", "Jumper"])
-analysis.save_to_csv(".")
-analysis.export_video(".")
+analysis.save_to_csv("./Results")
+analysis.export_video("./Results")

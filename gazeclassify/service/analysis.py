@@ -35,20 +35,16 @@ class Analysis:
         logging.info(f"Writing results to: {str(self.result_path)}")
         serializer = JsonSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
-        result_filename = self.result_path.joinpath("Result.json")
-        serializer.encode(self.results, result_filename)
+        serializer.encode(self.results, self._result_filename(".json"))
         return self
 
     def save_to_csv(self, folder: Optional[str] = None) -> Analysis:
         if folder is not None:
             self.result_path = Path(folder)
-        logging.info(f"Writing results to: {str(self.result_path)}")
+        logging.info(f"Writing results to Folder: {str(self.result_path)}")
         serializer = CSVSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
-        recording_path = Path(self.recording.metadata.recording_name).parent.parent.name
-        file_name = recording_path + "_" + self.trial_name + ".csv"
-        result_filename = self.result_path.joinpath(file_name)
-        serializer.encode(self.results, result_filename)
+        serializer.encode(self.results, self._result_filename())
         return self
 
     def export_video(self, folder: Optional[str] = None) -> Analysis:
@@ -56,8 +52,7 @@ class Analysis:
             self.result_path = Path(folder)
         video = CompositeVideo()
         video.index_videos(self.video_path)
-        result_filename = self.result_path.joinpath(self.trial_name + "_composite.mp4")
-        video.export(result_filename)
+        video.export(self._result_filename(".mp4"))
         return self
 
     def clear_data(self) -> Analysis:
@@ -67,6 +62,12 @@ class Analysis:
 
     def add_result(self, result: FrameResult) -> None:
         self.results.append(result)
+
+    def _result_filename(self, extension: str = ".csv"):
+        recording_path = Path(self.recording.metadata.recording_name).parent.parent.name
+        file_name = recording_path + "_" + self.trial_name + extension
+        result_filename = self.result_path.joinpath(file_name)
+        return result_filename
 
     def pieplot(self, filename: str = "pieplot.png") -> None:
         result_csv_file = str(self.result_path.joinpath(self.trial_name + ".csv"))

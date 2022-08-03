@@ -1,7 +1,7 @@
 # How to analyze results obtained with the GazeClassify package ?
 ***
 Running the GazeClassify package on eye tracking data should get you a csv file of this type.
-| Frame     | Name | Distance | Person_id | Joint |
+| Frame     | Name | Distance | Instance_id | Instance |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
 | 1   | Human_Shape | 0 | 0 |
 | 1   | Human_Joints | 250 | 0 | Neck

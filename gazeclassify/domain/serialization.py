@@ -25,7 +25,7 @@ class CSVSerializer:
     def encode(self, data: List[FrameResult], filename: Path) -> None:
         self._frame_result_to_dict(data)
         self._sort_dict_by_key("frame")
-        csv_columns = ["frame", "name", "distance", "person_id", "joint"]
+        csv_columns = ["frame", "name", "distance", "instance_id", "instance"]
         try:
             with open(str(filename), 'w', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
@@ -46,8 +46,8 @@ class CSVSerializer:
                 dict: Dict[str, str] = {}
                 dict["frame"] = str(data[result_idx].frame_id)
                 dict["name"] = data[result_idx].name
-                dict["person_id"] = ""
-                dict["joint"] = ""
+                dict["instance_id"] = ""
+                dict["instance"] = ""
 
                 if classification.distance == None:
                     dict["distance"] = ""
@@ -55,8 +55,8 @@ class CSVSerializer:
                     dict["distance"] = str(int(classification.distance))  # type: ignore
                 try:
                     instance = cast(InstanceClassification, classification)
-                    dict["person_id"] = str(instance.id)
-                    dict["joint"] = instance.name
+                    dict["instance_id"] = str(instance.id)
+                    dict["instance"] = instance.name
                 except:
                     pass
                 self._dict_data.append(dict)

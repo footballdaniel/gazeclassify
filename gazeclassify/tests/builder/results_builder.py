@@ -10,7 +10,7 @@ from gazeclassify.domain.results import FrameResult, Classification, InstanceCla
 class ClassificationBuilder:
     distance: Optional[float] = None
     joint: str = ""
-    person_id: int = 0
+    instance_id: int = 0
 
     def with_distance(self, distance: Optional[float]) -> ClassificationBuilder:
         self.distance = distance
@@ -21,7 +21,7 @@ class ClassificationBuilder:
         return self
 
     def with_person_id(self, person_id: int) -> ClassificationBuilder:
-        self.person_id = person_id
+        self.instance_id = person_id
         return self
 
     def build(self) -> Classification:
@@ -38,7 +38,7 @@ class InstanceClassificationBuilder(ClassificationBuilder):
         classification = InstanceClassification(
             self.distance,
             self.joint,
-            self.person_id
+            self.instance_id
         )
         return classification
 
