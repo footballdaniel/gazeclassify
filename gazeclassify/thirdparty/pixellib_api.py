@@ -45,6 +45,7 @@ class PixellibCustomTensorflowClassifier:
     def classify_frame(self, frame: np.ndarray) -> np.ndarray:
         self._get_frame_size(frame)
         segmentation_mask, _image = self.segment_image.segmentFrame(frame, show_bboxes=True)
+        self._boolean_masks = []
         boolean_mask = np.zeros((self.image_height, self.image_width), dtype=bool)
 
         for index, instance in enumerate(segmentation_mask["class_ids"]):
