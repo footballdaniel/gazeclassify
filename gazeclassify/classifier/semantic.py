@@ -40,7 +40,7 @@ class CustomSegmentation(Algorithm):
             classifications = classifier.gaze_distance_to_object(record)
             frame = classifier.visualize_gaze_overlay(frame)
             writer.write(frame)
-            frame_result = FrameResult(idx, classifier_name, classifications)
+            frame_result = FrameResult(idx, self._model, classifications)
             self.analysis.results.append(frame_result)
 
         writer.release()

@@ -45,7 +45,9 @@ class Analysis:
         logging.info(f"Writing results to: {str(self.result_path)}")
         serializer = CSVSerializer()
         Path.mkdir(self.result_path, parents=True, exist_ok=True)
-        result_filename = self.result_path.joinpath(self.trial_name + ".csv")
+        recording_path = Path(self.recording.metadata.recording_name).parent.parent.name
+        file_name = recording_path + "_" + self.trial_name + ".csv"
+        result_filename = self.result_path.joinpath(file_name)
         serializer.encode(self.results, result_filename)
         return self
 
