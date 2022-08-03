@@ -4,7 +4,8 @@ from gazeclassify.domain.dataset import DataRecord, GazeData
 from gazeclassify.thirdparty.opencv_api import OpenCVReader
 from gazeclassify.thirdparty.pixellib_api import PixellibCustomTensorflowClassifier
 
-# Learnings: the infer config needs to take exactly the right number of classes in (all that it was trained on. Each entry is four bytes
+# Learnings: the infer config needs to take exactly the right number of classes in
+# (all that it was trained on. Each entry is four bytes
 
 # Working example with squirrels.
 from matplotlib import image

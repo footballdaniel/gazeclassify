@@ -4,8 +4,8 @@ from matplotlib import image
 from gazeclassify.domain.dataset import DataRecord, GazeData
 from gazeclassify.thirdparty.pixellib_api import PixellibCustomTensorflowClassifier
 
-# Learnings: the infer config needs to take exactly the right number of classes in (all that it was trained on. Each entry is four bytes
-
+# Learnings: the infer config needs to take exactly the right number of classes in
+# (all that it was trained on. Each entry is four bytes)
 
 import pixellib
 from pixellib.instance import custom_segmentation
