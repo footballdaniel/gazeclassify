@@ -23,7 +23,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install types-setuptools
-        pip install mypy
         pip install -r requirements.txt
     - name: Install system dependency FFMPEG and OPENCV
       run: |
@@ -33,6 +32,3 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Test with mypy
-      run: |
-        mypy gazeclassify --strict
