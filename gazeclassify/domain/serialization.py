@@ -37,7 +37,7 @@ class CSVSerializer:
             JsonSerializer().encode(data, filename)
 
     def _sort_dict_by_key(self, primary_key: str = "frame") -> None:
-        self._dict_data = sorted(self._dict_data, key=lambda x: x[primary_key])  # type: ignore
+        self._dict_data = sorted(self._dict_data, key=lambda x: int(x[primary_key]))  # type: ignore
 
     def _frame_result_to_dict(self, data: List[FrameResult]) -> None:
         self._dict_data = []

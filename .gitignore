@@ -1,4 +1,5 @@
 # User defined ignores
+Results/
 .raw_data/
 .vscode/
 .raw_pixellib/

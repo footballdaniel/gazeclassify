@@ -55,10 +55,15 @@ def test_serialize_results_with_several_classifications_for_instance() -> None:
 
 def test_sort_list_of_dicts_by_dict_key() -> None:
     data = [{"frame": "1", "name": "A"}, {"frame": "0", "name": "B"}]
-
     serializer = CSVSerializer()
     serializer._dict_data = data
-
     serializer._sort_dict_by_key("frame")
-
     assert serializer._dict_data[0]["frame"] == "0"
+
+
+def test_sort_list_of_dicts_by_dict_key_with_several_digits() -> None:
+    data = [{"frame": "10", "name": "A"}, {"frame": "2", "name": "B"}]
+    serializer = CSVSerializer()
+    serializer._dict_data = data
+    serializer._sort_dict_by_key("frame")
+    assert serializer._dict_data[0]["frame"] == "2"
