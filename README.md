@@ -1,5 +1,5 @@
 # GazeClassify
-PiPy package to algorithmically annotate eye-tracking data. Recommended python version: 3.9
+PiPy package to algorithmically annotate eye-tracking data. Recommended python version: 3.7
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/footballdaniel/gazeclassify/blob/main/colab.ipynb)
 [![Test status](https://github.com/footballdaniel/gazeclassify/actions/workflows/test.yml/badge.svg)](https://github.com/footballdaniel/gazeclassify/actions/workflows/test.yml)

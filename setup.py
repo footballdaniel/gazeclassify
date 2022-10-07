@@ -3,22 +3,16 @@ import setuptools  # type: ignore
 with open("README.md", "r") as f:
     readme = f.read()
 
+with open('requirements.txt') as f:
+    packages = f.read().splitlines()
+
 setuptools.setup(
     name="gazeclassify",
     version="0.9.2",
     author="Daniel Müller",
     author_email="daniel@science.football",
     description="Algorithmic eye-tracking analysis",
-    install_requires=[
-        'tensorflow>=2.5.0',
-        'ffmpeg-python>=0.2.0',
-        'opencv-python>=4.1.2',
-        'pixellib>=0.6.6',
-        'tqdm>=4.60.0',
-        'moviepy>=1.0.3',
-        'tabulate>=0.8.9',
-        'pandas>=1.2.5'
-    ],
+    install_requires=packages,
     tests_require=['pytest'],
     long_description=readme,
     long_description_content_type="text/markdown",

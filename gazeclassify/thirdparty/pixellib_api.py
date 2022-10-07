@@ -33,8 +33,8 @@ class Mask:
 class PixellibCustomTensorflowClassifier:
     model_weights: str
     classifier_name: str
-    _all_trained_classes = list[str]
-    _boolean_masks: list[Mask] = field(default_factory=list)
+    _all_trained_classes: List[str] = field(default_factory=list)
+    _boolean_masks: List[Mask] = field(default_factory=list)
 
     def set_target(self, minimal_confidence: float = 0.7) -> None:
         self.segment_image = custom_segmentation()

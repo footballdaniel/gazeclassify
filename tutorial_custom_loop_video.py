@@ -3,9 +3,9 @@ import logging
 from gazeclassify import Analysis, PupilLoader, Find
 from gazeclassify.classifier.semantic import CustomSegmentation
 
-recordings_folder = "../../../data_link/participants/"
-model_file = "../../../data_link/models/mask_rcnn_model_all_AOIs.h5"
-results_folder = "../../../data_link/results/"
+recordings_folder = "../data_link/participants/"
+model_file = "../data_link/models/mask_rcnn_model_all_AOIs.h5"
+results_folder = "../data_link/results/"
 
 all_recordings = Find.recordings_in(recordings_folder, results_folder)
 
