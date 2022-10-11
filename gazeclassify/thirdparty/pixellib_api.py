@@ -51,10 +51,8 @@ class PixellibCustomTensorflowClassifier:
         for index, instance in enumerate(segmentation_mask["class_ids"]):
             class_name = self._all_trained_classes[instance]
             class_mask = segmentation_mask["masks"][:, :, index]
-            # np.any(class_mask, axis=-1) # needed?
             mask = Mask(class_name, class_mask)
             self._boolean_masks.append(mask)
-            # Concatenate mask
             boolean_mask = np.logical_or(boolean_mask, class_mask).reshape(self.image_height, self.image_width)
 
         int_concat = boolean_mask.astype('uint8') * 255
@@ -63,17 +61,15 @@ class PixellibCustomTensorflowClassifier:
 
     def gaze_distance_to_object(self, record: DataRecord) -> List[Classification]:
         classifications = []
+        self.pixel_x = record.gaze.x * self.image_width
+        self.pixel_y = self.image_height - (record.gaze.y * self.image_height)  # flip vertically
         for index, instance in enumerate(self._boolean_masks):
             binary_image_mask = instance.mask.astype('uint8')
             pixel_distance = DistanceToShape(binary_image_mask)
             pixel_distance.detect_shape(positive_values=1)
-            self.pixel_x = record.gaze.x * self.image_width
-            self.pixel_y = self.image_height - (record.gaze.y * self.image_height)  # flip vertically
             distance = pixel_distance.distance_2d(self.pixel_x, self.pixel_y)
-
             classification = InstanceClassification(distance, instance.name, index)
             classifications.append(classification)
-
         return classifications
 
     def visualize_gaze_overlay(self, image: np.ndarray) -> np.ndarray:
