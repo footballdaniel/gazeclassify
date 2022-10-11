@@ -138,3 +138,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+main.py
+is_gpu_supported.py

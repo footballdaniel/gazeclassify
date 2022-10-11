@@ -27,12 +27,12 @@ class Find:
 
     @classmethod
     def omit_already_analysed_results(cls, export_targets):
-
-        recording_name = "asfds"
         already_registered_results = [f.path for f in os.scandir(cls.results_folder) if f.is_file()]
         for result_file in already_registered_results:
-            if recording_name in result_file:
-                export_targets.pop(recording_name)
+            result_file_name = Path(result_file).stem
+            if any([target in result_file_name for target in export_targets.keys()]):
+                to_delete = [target for target in export_targets.keys() if target in result_file_name][0]
+                export_targets.pop(to_delete)
 
     @classmethod
     def search_recording_folder(cls):
@@ -70,7 +70,7 @@ class Find:
 
     @classmethod
     def _no_results_folder(cls, results_folder: str) -> bool:
-        return Path(cls.results_folder).exists
+        return not Path(cls.results_folder).exists()
 
 
 
