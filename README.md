@@ -52,15 +52,4 @@ InstanceSegmentation(analysis).classify("Human_Joints")
 analysis.save_to_csv()
 ```
 
-### Citation
-Please [cite this paper](https://dl.acm.org/doi/10.1145/3450341.3458886) in your publications if [GazeClassify](https://www.growkudos.com/publications/10.1145%25252F3450341.3458886/reader) helps your research. 
-
-```
-@inproceedings{10.1145/3450341.3458886,
-  author = {M\"{u}ller, Daniel and Mann, David},
-  title = {Algorithmic Gaze Classification for Mobile Eye-Tracking},
-  year = {2021},
-  booktitle = {ACM Symposium on Eye Tracking Research and Applications}
-}
-```
 
