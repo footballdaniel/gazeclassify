@@ -5,6 +5,8 @@ PiPy package to algorithmically annotate eye-tracking data. Recommended python v
 [![Test status](https://github.com/footballdaniel/gazeclassify/actions/workflows/test.yml/badge.svg)](https://github.com/footballdaniel/gazeclassify/actions/workflows/test.yml)
 [![Downloads](https://pepy.tech/badge/gazeclassify)](https://pepy.tech/project/gazeclassify)
 [![Downloads](https://pepy.tech/badge/gazeclassify/week)](https://pepy.tech/project/gazeclassify)
+[![DOI](https://zenodo.org/badge/333552541.svg)](https://zenodo.org/doi/10.5281/zenodo.13832500)
+
 
 ---
 ### What is GazeClassify?
